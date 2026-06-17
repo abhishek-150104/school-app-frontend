@@ -166,6 +166,14 @@ class SchoolsScreen extends ConsumerWidget {
                 context.push('/schools/$schoolId/classrooms', extra: schoolName);
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.badge_outlined),
+              title: const Text('Staff'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/schools/$schoolId/staff', extra: schoolName);
+              },
+            ),
           ],
         ),
       ),
