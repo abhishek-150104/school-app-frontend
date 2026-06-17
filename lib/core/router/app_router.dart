@@ -12,6 +12,11 @@ import '../../features/school/presentation/screens/schools_screen.dart';
 import '../../features/school/presentation/screens/academic_years_screen.dart';
 import '../../features/school/presentation/screens/classrooms_screen.dart';
 import '../../features/school/presentation/screens/sections_screen.dart';
+import '../../features/student/presentation/screens/students_screen.dart';
+import '../../features/student/presentation/screens/student_detail_screen.dart';
+import '../../features/student/presentation/screens/enroll_student_screen.dart';
+import '../../features/student/presentation/screens/my_children_screen.dart';
+import '../../features/student/data/models/student_models.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -83,6 +88,41 @@ final routerProvider = Provider<GoRouter>((ref) {
             schoolName: extra['schoolName'] ?? 'School',
           );
         },
+      ),
+
+      // ── Students ──────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/schools/:schoolId/students',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? '';
+          return StudentsScreen(schoolId: schoolId, schoolName: schoolName);
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/students/enroll',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? '';
+          return EnrollStudentScreen(
+              schoolId: schoolId, schoolName: schoolName);
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/students/:studentId',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final student = state.extra as StudentModel;
+          return StudentDetailScreen(schoolId: schoolId, student: student);
+        },
+      ),
+
+      // ── Parent ────────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/my-children',
+        builder: (_, __) => const MyChildrenScreen(),
       ),
     ],
   );
