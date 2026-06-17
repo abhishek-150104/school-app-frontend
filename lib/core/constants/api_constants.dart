@@ -60,6 +60,18 @@ class ApiConstants {
   static String transferStudent(String schoolId, String studentId) =>
       '/api/schools/$schoolId/students/$studentId/transfer';
   static const String myChildren = '/api/parents/me/students';
+
+  // Attendance
+  static String sectionAttendance(String schoolId, String sectionId) =>
+      '/api/schools/$schoolId/sections/$sectionId/attendance';
+  static String attendanceSummary(String schoolId, String sectionId) =>
+      '/api/schools/$schoolId/sections/$sectionId/attendance/summary';
+  static String studentAttendance(String schoolId, String studentId) =>
+      '/api/schools/$schoolId/students/$studentId/attendance';
+  static String attendanceRecord(String schoolId, String attendanceId) =>
+      '/api/schools/$schoolId/attendance/$attendanceId';
+  static String myChildAttendance(String studentId) =>
+      '/api/parents/me/students/$studentId/attendance';
 }
 
 class StorageKeys {

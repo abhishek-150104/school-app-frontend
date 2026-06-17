@@ -26,25 +26,30 @@ class StudentDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(student.fullName),
         actions: [
-          if (canManage)
-            PopupMenuButton<String>(
+          PopupMenuButton<String>(
               onSelected: (val) =>
                   _onMenuSelected(context, ref, val),
               itemBuilder: (_) => [
                 const PopupMenuItem(
-                    value: 'edit', child: Text('Edit Student')),
-                const PopupMenuItem(
-                    value: 'link_parent',
-                    child: Text('Link Parent')),
-                const PopupMenuItem(
-                    value: 'transfer',
-                    child: Text('Transfer Class')),
-                if (student.active)
-                  PopupMenuItem(
-                    value: 'deactivate',
-                    child: Text('Deactivate',
-                        style: TextStyle(color: Colors.red.shade700)),
-                  ),
+                    value: 'attendance',
+                    child: Text('View Attendance')),
+                if (canManage) ...[
+                  const PopupMenuItem(
+                      value: 'edit', child: Text('Edit Student')),
+                  const PopupMenuItem(
+                      value: 'link_parent',
+                      child: Text('Link Parent')),
+                  const PopupMenuItem(
+                      value: 'transfer',
+                      child: Text('Transfer Class')),
+                  if (student.active)
+                    PopupMenuItem(
+                      value: 'deactivate',
+                      child: Text('Deactivate',
+                          style:
+                              TextStyle(color: Colors.red.shade700)),
+                    ),
+                ],
               ],
             ),
         ],
@@ -213,6 +218,12 @@ class StudentDetailScreen extends ConsumerWidget {
 
   void _onMenuSelected(BuildContext context, WidgetRef ref, String action) {
     switch (action) {
+      case 'attendance':
+        context.push(
+          '/schools/$schoolId/students/${student.id}/attendance',
+          extra: student.fullName,
+        );
+        break;
       case 'edit':
         _showEditSheet(context, ref);
         break;
