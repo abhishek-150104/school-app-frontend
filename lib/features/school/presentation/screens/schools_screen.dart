@@ -110,7 +110,7 @@ class SchoolsScreen extends ConsumerWidget {
                         const Icon(Icons.chevron_right),
                       ],
                     ),
-                    onTap: () => context.push('/schools/${school.id}/academic-years'),
+                    onTap: () => _showSchoolMenu(context, school.id, school.name),
                     onLongPress: isSuperAdmin
                         ? () => _showSchoolOptions(context, ref, school.id,
                             school.name, school)
@@ -121,6 +121,53 @@ class SchoolsScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _showSchoolMenu(
+      BuildContext context, String schoolId, String schoolName) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Text(schoolName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.people_outline),
+              title: const Text('Students'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/schools/$schoolId/students', extra: schoolName);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today_outlined),
+              title: const Text('Academic Years'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/schools/$schoolId/academic-years',
+                    extra: schoolName);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.class_outlined),
+              title: const Text('Classrooms'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/schools/$schoolId/classrooms', extra: schoolName);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

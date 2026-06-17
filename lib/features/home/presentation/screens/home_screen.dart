@@ -128,8 +128,8 @@ class HomeScreen extends ConsumerWidget {
         return [
           _MenuItem(
             icon: Icons.people_outline,
-            title: 'My Students',
-            subtitle: 'View students in your class',
+            title: 'Students',
+            subtitle: 'View students in your school',
             color: Colors.orange,
             onTap: () => context.push('/schools'),
           ),
