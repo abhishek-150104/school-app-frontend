@@ -127,6 +127,13 @@ class HomeScreen extends ConsumerWidget {
       case 'TEACHER':
         return [
           _MenuItem(
+            icon: Icons.person_pin_outlined,
+            title: 'My Profile',
+            subtitle: 'View your profile and assigned sections',
+            color: Colors.deepPurple,
+            onTap: () => context.push('/teacher/my-profile'),
+          ),
+          _MenuItem(
             icon: Icons.people_outline,
             title: 'Students',
             subtitle: 'View students in your school',

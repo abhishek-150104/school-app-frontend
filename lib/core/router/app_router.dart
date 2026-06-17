@@ -17,6 +17,11 @@ import '../../features/student/presentation/screens/student_detail_screen.dart';
 import '../../features/student/presentation/screens/enroll_student_screen.dart';
 import '../../features/student/presentation/screens/my_children_screen.dart';
 import '../../features/student/data/models/student_models.dart';
+import '../../features/staff/presentation/screens/staff_screen.dart';
+import '../../features/staff/presentation/screens/staff_detail_screen.dart';
+import '../../features/staff/presentation/screens/create_staff_screen.dart';
+import '../../features/staff/presentation/screens/teacher_profile_screen.dart';
+import '../../features/staff/data/models/staff_models.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -123,6 +128,41 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/my-children',
         builder: (_, __) => const MyChildrenScreen(),
+      ),
+
+      // ── Staff ─────────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/schools/:schoolId/staff',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? '';
+          return StaffScreen(schoolId: schoolId, schoolName: schoolName);
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/staff/create',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? '';
+          return CreateStaffScreen(
+              schoolId: schoolId, schoolName: schoolName);
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/staff/:staffId',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final staff = state.extra as StaffModel;
+          return StaffDetailScreen(schoolId: schoolId, staff: staff);
+        },
+      ),
+
+      // ── Teacher ───────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/teacher/my-profile',
+        builder: (_, __) => const TeacherProfileScreen(),
       ),
     ],
   );

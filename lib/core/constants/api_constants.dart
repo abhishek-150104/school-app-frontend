@@ -40,6 +40,14 @@ class ApiConstants {
   static String assignTeacher(String schoolId, String classId, String sectionId) =>
       '/api/schools/$schoolId/classrooms/$classId/sections/$sectionId/assign-teacher';
 
+  // Staff
+  static String staff(String schoolId) => '/api/schools/$schoolId/staff';
+  static String staffMember(String schoolId, String staffId) =>
+      '/api/schools/$schoolId/staff/$staffId';
+  static String staffSearch(String schoolId) =>
+      '/api/schools/$schoolId/staff/search';
+  static const String teacherMyProfile = '/api/teacher/me/profile';
+
   // Students
   static String students(String schoolId) =>
       '/api/schools/$schoolId/students';
