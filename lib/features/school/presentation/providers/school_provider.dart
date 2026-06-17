@@ -2,44 +2,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/school_models.dart';
 import '../../data/repositories/school_repository.dart';
 
-// ── Schools ───────────────────────────────────────────────────────────────────
+// ── School (single) ───────────────────────────────────────────────────────────
 
-class SchoolListNotifier
-    extends StateNotifier<AsyncValue<List<SchoolModel>>> {
+class SchoolNotifier extends StateNotifier<AsyncValue<SchoolModel?>> {
   final SchoolRepository _repo;
 
-  SchoolListNotifier(this._repo) : super(const AsyncValue.loading()) {
+  SchoolNotifier(this._repo) : super(const AsyncValue.loading()) {
     load();
   }
 
   Future<void> load() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repo.getSchools());
+    state = await AsyncValue.guard(() => _repo.getSchool());
   }
 
-  Future<String?> create(Map<String, dynamic> data) async {
+  Future<String?> update(Map<String, dynamic> data) async {
     try {
-      await _repo.createSchool(data);
-      await load();
-      return null;
-    } catch (e) {
-      return e.toString();
-    }
-  }
-
-  Future<String?> update(String id, Map<String, dynamic> data) async {
-    try {
-      await _repo.updateSchool(id, data);
-      await load();
-      return null;
-    } catch (e) {
-      return e.toString();
-    }
-  }
-
-  Future<String?> delete(String id) async {
-    try {
-      await _repo.deleteSchool(id);
+      await _repo.updateSchool(data);
       await load();
       return null;
     } catch (e) {
@@ -48,30 +27,28 @@ class SchoolListNotifier
   }
 }
 
-final schoolListProvider =
-    StateNotifierProvider<SchoolListNotifier, AsyncValue<List<SchoolModel>>>(
-        (ref) => SchoolListNotifier(ref.read(schoolRepositoryProvider)));
+final schoolProvider =
+    StateNotifierProvider<SchoolNotifier, AsyncValue<SchoolModel?>>(
+        (ref) => SchoolNotifier(ref.read(schoolRepositoryProvider)));
 
 // ── Academic Years ────────────────────────────────────────────────────────────
 
 class AcademicYearNotifier
     extends StateNotifier<AsyncValue<List<AcademicYearModel>>> {
   final SchoolRepository _repo;
-  final String schoolId;
 
-  AcademicYearNotifier(this._repo, this.schoolId)
-      : super(const AsyncValue.loading()) {
+  AcademicYearNotifier(this._repo) : super(const AsyncValue.loading()) {
     load();
   }
 
   Future<void> load() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repo.getAcademicYears(schoolId));
+    state = await AsyncValue.guard(() => _repo.getAcademicYears());
   }
 
   Future<String?> create(Map<String, dynamic> data) async {
     try {
-      await _repo.createAcademicYear(schoolId, data);
+      await _repo.createAcademicYear(data);
       await load();
       return null;
     } catch (e) {
@@ -81,7 +58,7 @@ class AcademicYearNotifier
 
   Future<String?> activate(String yearId) async {
     try {
-      await _repo.activateYear(schoolId, yearId);
+      await _repo.activateYear(yearId);
       await load();
       return null;
     } catch (e) {
@@ -91,7 +68,7 @@ class AcademicYearNotifier
 
   Future<String?> delete(String yearId) async {
     try {
-      await _repo.deleteYear(schoolId, yearId);
+      await _repo.deleteYear(yearId);
       await load();
       return null;
     } catch (e) {
@@ -100,10 +77,9 @@ class AcademicYearNotifier
   }
 }
 
-final academicYearProvider = StateNotifierProvider.family<AcademicYearNotifier,
-    AsyncValue<List<AcademicYearModel>>, String>(
-  (ref, schoolId) =>
-      AcademicYearNotifier(ref.read(schoolRepositoryProvider), schoolId),
+final academicYearProvider =
+    StateNotifierProvider<AcademicYearNotifier, AsyncValue<List<AcademicYearModel>>>(
+  (ref) => AcademicYearNotifier(ref.read(schoolRepositoryProvider)),
 );
 
 // ── Classrooms ────────────────────────────────────────────────────────────────
@@ -111,11 +87,9 @@ final academicYearProvider = StateNotifierProvider.family<AcademicYearNotifier,
 class ClassRoomNotifier
     extends StateNotifier<AsyncValue<List<ClassRoomModel>>> {
   final SchoolRepository _repo;
-  final String schoolId;
   String? selectedYearId;
 
-  ClassRoomNotifier(this._repo, this.schoolId)
-      : super(const AsyncValue.loading()) {
+  ClassRoomNotifier(this._repo) : super(const AsyncValue.loading()) {
     load();
   }
 
@@ -123,12 +97,12 @@ class ClassRoomNotifier
     selectedYearId = academicYearId ?? selectedYearId;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-        () => _repo.getClassrooms(schoolId, academicYearId: selectedYearId));
+        () => _repo.getClassrooms(academicYearId: selectedYearId));
   }
 
   Future<String?> create(Map<String, dynamic> data) async {
     try {
-      await _repo.createClassroom(schoolId, data);
+      await _repo.createClassroom(data);
       await load();
       return null;
     } catch (e) {
@@ -138,7 +112,7 @@ class ClassRoomNotifier
 
   Future<String?> update(String classId, Map<String, dynamic> data) async {
     try {
-      await _repo.updateClassroom(schoolId, classId, data);
+      await _repo.updateClassroom(classId, data);
       await load();
       return null;
     } catch (e) {
@@ -148,7 +122,7 @@ class ClassRoomNotifier
 
   Future<String?> delete(String classId) async {
     try {
-      await _repo.deleteClassroom(schoolId, classId);
+      await _repo.deleteClassroom(classId);
       await load();
       return null;
     } catch (e) {
@@ -157,10 +131,9 @@ class ClassRoomNotifier
   }
 }
 
-final classRoomProvider = StateNotifierProvider.family<ClassRoomNotifier,
-    AsyncValue<List<ClassRoomModel>>, String>(
-  (ref, schoolId) =>
-      ClassRoomNotifier(ref.read(schoolRepositoryProvider), schoolId),
+final classRoomProvider =
+    StateNotifierProvider<ClassRoomNotifier, AsyncValue<List<ClassRoomModel>>>(
+  (ref) => ClassRoomNotifier(ref.read(schoolRepositoryProvider)),
 );
 
 // ── Sections ──────────────────────────────────────────────────────────────────
@@ -168,23 +141,20 @@ final classRoomProvider = StateNotifierProvider.family<ClassRoomNotifier,
 class SectionNotifier
     extends StateNotifier<AsyncValue<List<SectionModel>>> {
   final SchoolRepository _repo;
-  final String schoolId;
   final String classId;
 
-  SectionNotifier(this._repo, this.schoolId, this.classId)
-      : super(const AsyncValue.loading()) {
+  SectionNotifier(this._repo, this.classId) : super(const AsyncValue.loading()) {
     load();
   }
 
   Future<void> load() async {
     state = const AsyncValue.loading();
-    state =
-        await AsyncValue.guard(() => _repo.getSections(schoolId, classId));
+    state = await AsyncValue.guard(() => _repo.getSections(classId));
   }
 
   Future<String?> create(Map<String, dynamic> data) async {
     try {
-      await _repo.createSection(schoolId, classId, data);
+      await _repo.createSection(classId, data);
       await load();
       return null;
     } catch (e) {
@@ -194,7 +164,7 @@ class SectionNotifier
 
   Future<String?> delete(String sectionId) async {
     try {
-      await _repo.deleteSection(schoolId, classId, sectionId);
+      await _repo.deleteSection(classId, sectionId);
       await load();
       return null;
     } catch (e) {
@@ -203,12 +173,9 @@ class SectionNotifier
   }
 }
 
-// Key: 'schoolId:classId'
+// Key: classId
 final sectionProvider = StateNotifierProvider.family<SectionNotifier,
     AsyncValue<List<SectionModel>>, String>(
-  (ref, key) {
-    final parts = key.split(':');
-    return SectionNotifier(
-        ref.read(schoolRepositoryProvider), parts[0], parts[1]);
-  },
+  (ref, classId) =>
+      SectionNotifier(ref.read(schoolRepositoryProvider), classId),
 );

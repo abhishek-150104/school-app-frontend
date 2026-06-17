@@ -1,7 +1,7 @@
 class ApiConstants {
   // Change to your machine's IP when testing on a physical device
   // Android emulator: 10.0.2.2 maps to host localhost
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  static const String baseUrl = 'http://localhost:8080';
 
   // Auth
   static const String login = '/api/auth/login';
@@ -12,64 +12,65 @@ class ApiConstants {
   static const String resetPassword = '/api/auth/reset-password';
   static const String refreshToken = '/api/auth/refresh-token';
   static const String logout = '/api/auth/logout';
+  static const String setupAccount = '/api/auth/setup-account';
   static const String profile = '/api/users/profile';
 
-  // Schools
-  static const String schools = '/api/schools';
-  static String school(String id) => '/api/schools/$id';
+  // School (single)
+  static const String school = '/api/school';
+
+  // Admins
+  static const String admins = '/api/admins';
+  static String adminDisable(String userId) => '/api/admins/$userId/disable';
 
   // Academic Years
-  static String academicYears(String schoolId) =>
-      '/api/schools/$schoolId/academic-years';
-  static String academicYear(String schoolId, String yearId) =>
-      '/api/schools/$schoolId/academic-years/$yearId';
-  static String activateYear(String schoolId, String yearId) =>
-      '/api/schools/$schoolId/academic-years/$yearId/activate';
+  static const String academicYears = '/api/academic-years';
+  static String academicYear(String yearId) => '/api/academic-years/$yearId';
+  static String activateYear(String yearId) =>
+      '/api/academic-years/$yearId/activate';
 
   // Classrooms
-  static String classrooms(String schoolId) =>
-      '/api/schools/$schoolId/classrooms';
-  static String classroom(String schoolId, String classId) =>
-      '/api/schools/$schoolId/classrooms/$classId';
+  static const String classrooms = '/api/classrooms';
+  static String classroom(String classId) => '/api/classrooms/$classId';
 
   // Sections
-  static String sections(String schoolId, String classId) =>
-      '/api/schools/$schoolId/classrooms/$classId/sections';
-  static String section(String schoolId, String classId, String sectionId) =>
-      '/api/schools/$schoolId/classrooms/$classId/sections/$sectionId';
-  static String assignTeacher(String schoolId, String classId, String sectionId) =>
-      '/api/schools/$schoolId/classrooms/$classId/sections/$sectionId/assign-teacher';
+  static String sections(String classId) =>
+      '/api/classrooms/$classId/sections';
+  static String section(String classId, String sectionId) =>
+      '/api/classrooms/$classId/sections/$sectionId';
+  static String assignTeacher(String classId, String sectionId) =>
+      '/api/classrooms/$classId/sections/$sectionId/assign-teacher';
 
   // Staff
-  static String staff(String schoolId) => '/api/schools/$schoolId/staff';
-  static String staffMember(String schoolId, String staffId) =>
-      '/api/schools/$schoolId/staff/$staffId';
-  static String staffSearch(String schoolId) =>
-      '/api/schools/$schoolId/staff/search';
+  static const String staff = '/api/staff';
+  static String staffMember(String staffId) => '/api/staff/$staffId';
+  static const String staffSearch = '/api/staff/search';
   static const String teacherMyProfile = '/api/teacher/me/profile';
 
   // Students
-  static String students(String schoolId) =>
-      '/api/schools/$schoolId/students';
-  static String student(String schoolId, String studentId) =>
-      '/api/schools/$schoolId/students/$studentId';
-  static String studentSearch(String schoolId) =>
-      '/api/schools/$schoolId/students/search';
-  static String linkParent(String schoolId, String studentId) =>
-      '/api/schools/$schoolId/students/$studentId/link-parent';
-  static String transferStudent(String schoolId, String studentId) =>
-      '/api/schools/$schoolId/students/$studentId/transfer';
+  static const String students = '/api/students';
+  static String student(String studentId) => '/api/students/$studentId';
+  static const String studentSearch = '/api/students/search';
+  static String linkParent(String studentId) =>
+      '/api/students/$studentId/link-parent';
+  static String transferStudent(String studentId) =>
+      '/api/students/$studentId/transfer';
   static const String myChildren = '/api/parents/me/students';
 
+  // Subjects
+  static String subjects(String classId) =>
+      '/api/classrooms/$classId/subjects';
+  static String subject(String classId, String subjectId) =>
+      '/api/classrooms/$classId/subjects/$subjectId';
+
   // Attendance
-  static String sectionAttendance(String schoolId, String sectionId) =>
-      '/api/schools/$schoolId/sections/$sectionId/attendance';
-  static String attendanceSummary(String schoolId, String sectionId) =>
-      '/api/schools/$schoolId/sections/$sectionId/attendance/summary';
-  static String studentAttendance(String schoolId, String studentId) =>
-      '/api/schools/$schoolId/students/$studentId/attendance';
-  static String attendanceRecord(String schoolId, String attendanceId) =>
-      '/api/schools/$schoolId/attendance/$attendanceId';
+  static String sectionAttendance(String sectionId) =>
+      '/api/sections/$sectionId/attendance';
+  static String attendanceSummary(String sectionId) =>
+      '/api/sections/$sectionId/attendance/summary';
+  static String studentAttendance(String studentId) =>
+      '/api/students/$studentId/attendance';
+  static String attendanceRecord(String attendanceId) =>
+      '/api/attendance/$attendanceId';
   static String myChildAttendance(String studentId) =>
       '/api/parents/me/students/$studentId/attendance';
 }

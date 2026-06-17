@@ -21,7 +21,7 @@ class AuthRepository {
     try {
       final response = await _dio.post(
         ApiConstants.login,
-        data: {'identifier': identifier, 'password': password},
+        data: {'username': identifier, 'password': password},
       );
       final auth = AuthResponse.fromJson(response.data['data']);
       await _storage.saveTokens(
@@ -121,6 +121,24 @@ class AuthRepository {
       rethrow;
     } catch (e) {
       throw ApiException('Failed to update profile.');
+    }
+  }
+
+  Future<void> setupAccount({
+    String? email,
+    String? phone,
+    required String newPassword,
+  }) async {
+    try {
+      await _dio.put(ApiConstants.setupAccount, data: {
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+        'newPassword': newPassword,
+      });
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Account setup failed. Please try again.');
     }
   }
 

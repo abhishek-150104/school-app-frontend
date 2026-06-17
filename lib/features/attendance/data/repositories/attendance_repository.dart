@@ -7,11 +7,10 @@ class AttendanceRepository {
   final DioClient _dio;
   AttendanceRepository(this._dio);
 
-  Future<List<AttendanceModel>> getBySection(
-      String schoolId, String sectionId, String date) async {
+  Future<List<AttendanceModel>> getBySection(String sectionId, String date) async {
     final res = await _dio.get(
-      ApiConstants.sectionAttendance(schoolId, sectionId),
-      queryParameters: {'date': date},
+      ApiConstants.sectionAttendance(sectionId),
+      params: {'date': date},
     );
     return (res.data['data'] as List)
         .map((e) => AttendanceModel.fromJson(e as Map<String, dynamic>))
@@ -19,12 +18,9 @@ class AttendanceRepository {
   }
 
   Future<List<AttendanceModel>> markBulk(
-      String schoolId,
-      String sectionId,
-      String date,
-      List<AttendanceEntry> entries) async {
+      String sectionId, String date, List<AttendanceEntry> entries) async {
     final res = await _dio.post(
-      ApiConstants.sectionAttendance(schoolId, sectionId),
+      ApiConstants.sectionAttendance(sectionId),
       data: {
         'date': date,
         'records': entries.map((e) => e.toJson()).toList(),
@@ -36,20 +32,20 @@ class AttendanceRepository {
   }
 
   Future<AttendanceSummaryModel> getSummary(
-      String schoolId, String sectionId, String from, String to) async {
+      String sectionId, String from, String to) async {
     final res = await _dio.get(
-      ApiConstants.attendanceSummary(schoolId, sectionId),
-      queryParameters: {'from': from, 'to': to},
+      ApiConstants.attendanceSummary(sectionId),
+      params: {'from': from, 'to': to},
     );
     return AttendanceSummaryModel.fromJson(
         res.data['data'] as Map<String, dynamic>);
   }
 
   Future<List<AttendanceModel>> getByStudent(
-      String schoolId, String studentId, String from, String to) async {
+      String studentId, String from, String to) async {
     final res = await _dio.get(
-      ApiConstants.studentAttendance(schoolId, studentId),
-      queryParameters: {'from': from, 'to': to},
+      ApiConstants.studentAttendance(studentId),
+      params: {'from': from, 'to': to},
     );
     return (res.data['data'] as List)
         .map((e) => AttendanceModel.fromJson(e as Map<String, dynamic>))
@@ -60,7 +56,7 @@ class AttendanceRepository {
       String studentId, String from, String to) async {
     final res = await _dio.get(
       ApiConstants.myChildAttendance(studentId),
-      queryParameters: {'from': from, 'to': to},
+      params: {'from': from, 'to': to},
     );
     return (res.data['data'] as List)
         .map((e) => AttendanceModel.fromJson(e as Map<String, dynamic>))
@@ -68,10 +64,9 @@ class AttendanceRepository {
   }
 
   Future<AttendanceModel> updateRecord(
-      String schoolId, String attendanceId, AttendanceStatus status,
-      {String? remarks}) async {
+      String attendanceId, AttendanceStatus status, {String? remarks}) async {
     final res = await _dio.put(
-      ApiConstants.attendanceRecord(schoolId, attendanceId),
+      ApiConstants.attendanceRecord(attendanceId),
       data: {
         'status': status.apiValue,
         if (remarks != null) 'remarks': remarks,

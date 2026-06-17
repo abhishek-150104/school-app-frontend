@@ -8,39 +8,25 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../core/utils/validators.dart';
 
 class SectionsScreen extends ConsumerWidget {
-  final String schoolId;
   final String classId;
   final String className;
-  final String schoolName;
 
   const SectionsScreen({
     super.key,
-    required this.schoolId,
     required this.classId,
     required this.className,
-    required this.schoolName,
   });
-
-  String get _key => '$schoolId:$classId';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sectionsAsync = ref.watch(sectionProvider(_key));
+    final sectionsAsync = ref.watch(sectionProvider(classId));
     final user = ref.watch(authProvider).user;
     final canEdit =
         user?.isSuperAdmin == true || user?.isSchoolAdmin == true;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(className, style: const TextStyle(fontSize: 16)),
-            Text(schoolName,
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.normal)),
-          ],
-        ),
+        title: Text(className, style: const TextStyle(fontSize: 16)),
       ),
       floatingActionButton: canEdit
           ? FloatingActionButton.extended(
@@ -65,7 +51,7 @@ class SectionsScreen extends ConsumerWidget {
           }
           return RefreshIndicator(
             onRefresh: () =>
-                ref.read(sectionProvider(_key).notifier).load(),
+                ref.read(sectionProvider(classId).notifier).load(),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: sections.length,
@@ -133,7 +119,7 @@ class SectionsScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _CreateSectionSheet(
-        sectionKey: _key,
+        classId: classId,
         ref: ref,
       ),
     );
@@ -154,7 +140,7 @@ class SectionsScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               final err = await ref
-                  .read(sectionProvider(_key).notifier)
+                  .read(sectionProvider(classId).notifier)
                   .delete(sectionId);
               if (err != null && context.mounted) {
                 ScaffoldMessenger.of(context)
@@ -171,10 +157,10 @@ class SectionsScreen extends ConsumerWidget {
 }
 
 class _CreateSectionSheet extends StatefulWidget {
-  final String sectionKey;
+  final String classId;
   final WidgetRef ref;
   const _CreateSectionSheet(
-      {required this.sectionKey, required this.ref});
+      {required this.classId, required this.ref});
 
   @override
   State<_CreateSectionSheet> createState() => _CreateSectionSheetState();
@@ -197,7 +183,7 @@ class _CreateSectionSheetState extends State<_CreateSectionSheet> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     final err = await widget.ref
-        .read(sectionProvider(widget.sectionKey).notifier)
+        .read(sectionProvider(widget.classId).notifier)
         .create({
       'name': _nameCtrl.text.trim(),
       'capacity': int.tryParse(_capacityCtrl.text.trim()) ?? 40,

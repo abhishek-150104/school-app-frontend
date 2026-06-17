@@ -2,21 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/staff_models.dart';
 import '../../data/repositories/staff_repository.dart';
 
-// ── Staff list (by schoolId) ──────────────────────────────────────────────────
+// ── Staff list ────────────────────────────────────────────────────────────────
 
-class StaffListNotifier
-    extends StateNotifier<AsyncValue<List<StaffModel>>> {
+class StaffListNotifier extends StateNotifier<AsyncValue<List<StaffModel>>> {
   final StaffRepository _repo;
-  final String schoolId;
 
-  StaffListNotifier(this._repo, this.schoolId)
-      : super(const AsyncValue.loading()) {
+  StaffListNotifier(this._repo) : super(const AsyncValue.loading()) {
     load();
   }
 
   Future<void> load() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repo.getStaff(schoolId));
+    state = await AsyncValue.guard(() => _repo.getStaff());
   }
 
   Future<void> search(String query) async {
@@ -25,13 +22,12 @@ class StaffListNotifier
       return;
     }
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-        () => _repo.searchStaff(schoolId, query.trim()));
+    state = await AsyncValue.guard(() => _repo.searchStaff(query.trim()));
   }
 
   Future<String?> create(Map<String, dynamic> data) async {
     try {
-      await _repo.createStaff(schoolId, data);
+      await _repo.createStaff(data);
       await load();
       return null;
     } catch (e) {
@@ -41,7 +37,7 @@ class StaffListNotifier
 
   Future<String?> update(String staffId, Map<String, dynamic> data) async {
     try {
-      await _repo.updateStaff(schoolId, staffId, data);
+      await _repo.updateStaff(staffId, data);
       await load();
       return null;
     } catch (e) {
@@ -51,7 +47,7 @@ class StaffListNotifier
 
   Future<String?> deactivate(String staffId) async {
     try {
-      await _repo.deactivateStaff(schoolId, staffId);
+      await _repo.deactivateStaff(staffId);
       await load();
       return null;
     } catch (e) {
@@ -60,10 +56,9 @@ class StaffListNotifier
   }
 }
 
-final staffListProvider = StateNotifierProvider.family<StaffListNotifier,
-    AsyncValue<List<StaffModel>>, String>(
-  (ref, schoolId) =>
-      StaffListNotifier(ref.read(staffRepositoryProvider), schoolId),
+final staffListProvider =
+    StateNotifierProvider<StaffListNotifier, AsyncValue<List<StaffModel>>>(
+  (ref) => StaffListNotifier(ref.read(staffRepositoryProvider)),
 );
 
 // ── Teacher profile (self) ────────────────────────────────────────────────────

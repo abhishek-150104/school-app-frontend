@@ -60,14 +60,8 @@ class _SchoolFormSheetState extends State<SchoolFormSheet> {
         'affiliationNumber': _affiliation.text.trim(),
     };
 
-    String? err;
-    if (_isEdit) {
-      err = await widget.ref
-          .read(schoolListProvider.notifier)
-          .update(widget.existing!['id'], data);
-    } else {
-      err = await widget.ref.read(schoolListProvider.notifier).create(data);
-    }
+    // Always update the single school
+    final err = await widget.ref.read(schoolProvider.notifier).update(data);
 
     setState(() => _isLoading = false);
     if (!mounted) return;

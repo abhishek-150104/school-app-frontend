@@ -6,14 +6,12 @@ import '../../../student/presentation/providers/student_provider.dart';
 import '../../data/models/attendance_models.dart';
 
 class MarkAttendanceScreen extends ConsumerStatefulWidget {
-  final String schoolId;
   final String sectionId;
   final String sectionName;
   final String classRoomName;
 
   const MarkAttendanceScreen({
     super.key,
-    required this.schoolId,
     required this.sectionId,
     required this.sectionName,
     required this.classRoomName,
@@ -28,9 +26,6 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   late DateTime _selectedDate;
   bool _initialized = false;
 
-  String get _providerKey =>
-      '${widget.schoolId}:${widget.sectionId}';
-
   String get _dateStr => DateFormat('yyyy-MM-dd').format(_selectedDate);
 
   @override
@@ -41,12 +36,12 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
   }
 
   Future<void> _loadStudents() async {
-    final notifier = ref.read(studentListProvider(widget.schoolId).notifier);
+    final notifier = ref.read(studentListProvider.notifier);
     await notifier.load(sectionId: widget.sectionId);
-    final students = ref.read(studentListProvider(widget.schoolId)).value ?? [];
+    final students = ref.read(studentListProvider).value ?? [];
     final activeStudents = students.where((s) => s.active).toList();
 
-    final markNotifier = ref.read(markAttendanceProvider(_providerKey).notifier);
+    final markNotifier = ref.read(markAttendanceProvider(widget.sectionId).notifier);
     markNotifier.initEntries(activeStudents.map((s) => s.id).toList());
     await markNotifier.loadExisting(_dateStr);
     setState(() => _initialized = true);
@@ -65,7 +60,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
         _initialized = false;
       });
       await ref
-          .read(markAttendanceProvider(_providerKey).notifier)
+          .read(markAttendanceProvider(widget.sectionId).notifier)
           .loadExisting(_dateStr);
       setState(() => _initialized = true);
     }
@@ -73,7 +68,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
 
   Future<void> _submit() async {
     final success = await ref
-        .read(markAttendanceProvider(_providerKey).notifier)
+        .read(markAttendanceProvider(widget.sectionId).notifier)
         .submit(_dateStr);
     if (mounted) {
       if (success) {
@@ -84,7 +79,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
         );
       } else {
         final err =
-            ref.read(markAttendanceProvider(_providerKey)).error ?? 'Error';
+            ref.read(markAttendanceProvider(widget.sectionId)).error ?? 'Error';
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(err)));
       }
@@ -93,8 +88,8 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final markState = ref.watch(markAttendanceProvider(_providerKey));
-    final studentsAsync = ref.watch(studentListProvider(widget.schoolId));
+    final markState = ref.watch(markAttendanceProvider(widget.sectionId));
+    final studentsAsync = ref.watch(studentListProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -183,7 +178,7 @@ class _MarkAttendanceScreenState extends ConsumerState<MarkAttendanceScreen> {
                         trailing: _StatusToggle(
                           status: status,
                           onChanged: (s) => ref
-                              .read(markAttendanceProvider(_providerKey)
+                              .read(markAttendanceProvider(widget.sectionId)
                                   .notifier)
                               .setStatus(student.id, s),
                         ),

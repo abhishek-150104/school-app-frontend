@@ -11,45 +11,37 @@ class StaffRepository {
   final DioClient _dio;
   StaffRepository(this._dio);
 
-  Future<List<StaffModel>> getStaff(String schoolId) async {
-    final res = await _dio.get(ApiConstants.staff(schoolId));
+  Future<List<StaffModel>> getStaff() async {
+    final res = await _dio.get(ApiConstants.staff);
     return (res.data['data'] as List)
         .map((e) => StaffModel.fromJson(e))
         .toList();
   }
 
-  Future<List<StaffModel>> searchStaff(
-      String schoolId, String query) async {
-    final res = await _dio.get(ApiConstants.staffSearch(schoolId),
-        params: {'q': query});
+  Future<List<StaffModel>> searchStaff(String query) async {
+    final res = await _dio.get(ApiConstants.staffSearch, params: {'q': query});
     return (res.data['data'] as List)
         .map((e) => StaffModel.fromJson(e))
         .toList();
   }
 
-  Future<StaffModel> getStaffMember(
-      String schoolId, String staffId) async {
-    final res =
-        await _dio.get(ApiConstants.staffMember(schoolId, staffId));
+  Future<StaffModel> getStaffMember(String staffId) async {
+    final res = await _dio.get(ApiConstants.staffMember(staffId));
     return StaffModel.fromJson(res.data['data']);
   }
 
-  Future<StaffModel> createStaff(
-      String schoolId, Map<String, dynamic> data) async {
-    final res = await _dio.post(ApiConstants.staff(schoolId), data: data);
+  Future<Map<String, dynamic>> createStaff(Map<String, dynamic> data) async {
+    final res = await _dio.post(ApiConstants.staff, data: data);
+    return res.data['data'] as Map<String, dynamic>;
+  }
+
+  Future<StaffModel> updateStaff(String staffId, Map<String, dynamic> data) async {
+    final res = await _dio.put(ApiConstants.staffMember(staffId), data: data);
     return StaffModel.fromJson(res.data['data']);
   }
 
-  Future<StaffModel> updateStaff(String schoolId, String staffId,
-      Map<String, dynamic> data) async {
-    final res = await _dio.put(
-        ApiConstants.staffMember(schoolId, staffId),
-        data: data);
-    return StaffModel.fromJson(res.data['data']);
-  }
-
-  Future<void> deactivateStaff(String schoolId, String staffId) =>
-      _dio.delete(ApiConstants.staffMember(schoolId, staffId));
+  Future<void> deactivateStaff(String staffId) =>
+      _dio.delete(ApiConstants.staffMember(staffId));
 
   Future<TeacherProfileModel> getTeacherProfile() async {
     final res = await _dio.get(ApiConstants.teacherMyProfile);

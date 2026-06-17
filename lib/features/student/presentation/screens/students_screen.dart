@@ -7,14 +7,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../data/models/student_models.dart';
 
 class StudentsScreen extends ConsumerStatefulWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const StudentsScreen({
-    super.key,
-    required this.schoolId,
-    required this.schoolName,
-  });
+  const StudentsScreen({super.key});
 
   @override
   ConsumerState<StudentsScreen> createState() => _StudentsScreenState();
@@ -31,18 +24,18 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
   }
 
   void _onSearchChanged(String value) {
-    ref.read(studentListProvider(widget.schoolId).notifier).search(value);
+    ref.read(studentListProvider.notifier).search(value);
   }
 
   void _clearSearch() {
     _searchCtrl.clear();
-    ref.read(studentListProvider(widget.schoolId).notifier).load();
+    ref.read(studentListProvider.notifier).load();
     setState(() => _searching = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final studentsAsync = ref.watch(studentListProvider(widget.schoolId));
+    final studentsAsync = ref.watch(studentListProvider);
     final user = ref.watch(authProvider).user;
     final canManage =
         user?.isSuperAdmin == true || user?.isSchoolAdmin == true;
@@ -60,9 +53,7 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
                 ),
                 style: const TextStyle(fontSize: 16),
               )
-            : Text(widget.schoolName.isEmpty
-                ? 'Students'
-                : '${widget.schoolName} — Students'),
+            : const Text('Students'),
         actions: [
           if (_searching)
             IconButton(
@@ -80,10 +71,7 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
           ? FloatingActionButton.extended(
               icon: const Icon(Icons.person_add_outlined),
               label: const Text('Enroll Student'),
-              onPressed: () => context.push(
-                '/schools/${widget.schoolId}/students/enroll',
-                extra: widget.schoolName,
-              ),
+              onPressed: () => context.push('/students/enroll'),
             )
           : null,
       body: studentsAsync.when(
@@ -97,7 +85,7 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => ref
-                    .read(studentListProvider(widget.schoolId).notifier)
+                    .read(studentListProvider.notifier)
                     .load(),
                 child: const Text('Retry'),
               ),
@@ -114,26 +102,22 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
                   : 'No students are available right now',
               actionLabel: canManage ? 'Enroll Student' : null,
               onAction: canManage
-                  ? () => context.push(
-                        '/schools/${widget.schoolId}/students/enroll',
-                        extra: widget.schoolName,
-                      )
+                  ? () => context.push('/students/enroll')
                   : null,
             );
           }
           return RefreshIndicator(
             onRefresh: () => ref
-                .read(studentListProvider(widget.schoolId).notifier)
+                .read(studentListProvider.notifier)
                 .load(),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: students.length,
               itemBuilder: (_, i) => _StudentCard(
                 student: students[i],
-                schoolId: widget.schoolId,
                 canManage: canManage,
                 onDeactivated: () => ref
-                    .read(studentListProvider(widget.schoolId).notifier)
+                    .read(studentListProvider.notifier)
                     .load(),
               ),
             ),
@@ -146,13 +130,11 @@ class _StudentsScreenState extends ConsumerState<StudentsScreen> {
 
 class _StudentCard extends ConsumerWidget {
   final StudentModel student;
-  final String schoolId;
   final bool canManage;
   final VoidCallback onDeactivated;
 
   const _StudentCard({
     required this.student,
-    required this.schoolId,
     required this.canManage,
     required this.onDeactivated,
   });
@@ -210,7 +192,7 @@ class _StudentCard extends ConsumerWidget {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push(
-          '/schools/$schoolId/students/${student.id}',
+          '/students/${student.id}',
           extra: student,
         ),
       ),

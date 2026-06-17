@@ -87,7 +87,6 @@ class HomeScreen extends ConsumerWidget {
                 style: theme.textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            // Role-based menu items (will expand in Part 2 and 3)
             ..._menuItems(context, user.role).map((item) => _MenuCard(item: item)),
           ],
         ),
@@ -96,64 +95,107 @@ class HomeScreen extends ConsumerWidget {
   }
 
   List<_MenuItem> _menuItems(BuildContext context, String role) {
-    switch (role) {
-      case 'SUPER_ADMIN':
-        return [
-          _MenuItem(
-            icon: Icons.business_outlined,
-            title: 'Schools',
-            subtitle: 'Create and manage schools',
-            color: Colors.blue,
-            onTap: () => context.push('/schools'),
-          ),
-        ];
-      case 'SCHOOL_ADMIN':
-        return [
-          _MenuItem(
-            icon: Icons.business_outlined,
-            title: 'Schools',
-            subtitle: 'View and manage your school',
-            color: Colors.blue,
-            onTap: () => context.push('/schools'),
-          ),
-          _MenuItem(
-            icon: Icons.people_outline,
-            title: 'Students',
-            subtitle: 'Manage student enrollment',
-            color: Colors.teal,
-            onTap: () => context.push('/schools'),
-          ),
-        ];
-      case 'TEACHER':
-        return [
-          _MenuItem(
-            icon: Icons.person_pin_outlined,
-            title: 'My Profile',
-            subtitle: 'View your profile and assigned sections',
-            color: Colors.deepPurple,
-            onTap: () => context.push('/teacher/my-profile'),
-          ),
-          _MenuItem(
-            icon: Icons.people_outline,
-            title: 'Students',
-            subtitle: 'View students in your school',
-            color: Colors.orange,
-            onTap: () => context.push('/schools'),
-          ),
-        ];
-      case 'PARENT':
-        return [
-          _MenuItem(
-            icon: Icons.child_care_outlined,
-            title: 'My Children',
-            subtitle: 'View your children\'s profile',
-            color: Colors.pink,
-            onTap: () => context.push('/my-children'),
-          ),
-        ];
-      default:
-        return [];
+    final isSuperAdmin = role == 'SUPER_ADMIN';
+    final isAdmin = role == 'SUPER_ADMIN' || role == 'SCHOOL_ADMIN';
+    final isTeacherOrAbove = isAdmin || role == 'TEACHER';
+
+    final items = <_MenuItem>[];
+
+    if (isAdmin) {
+      items.add(_MenuItem(
+        icon: Icons.school_outlined,
+        title: 'School Info',
+        subtitle: 'View and update school details',
+        color: Colors.blue,
+        onTap: () => context.push('/school-info'),
+      ));
     }
+
+    if (isSuperAdmin) {
+      items.add(_MenuItem(
+        icon: Icons.manage_accounts_outlined,
+        title: 'Admin Accounts',
+        subtitle: 'Create and manage school admins',
+        color: Colors.deepOrange,
+        onTap: () => context.push('/admins'),
+      ));
+    }
+
+    if (isAdmin) {
+      items.add(_MenuItem(
+        icon: Icons.calendar_today_outlined,
+        title: 'Academic Years',
+        subtitle: 'Manage academic year settings',
+        color: Colors.teal,
+        onTap: () => context.push('/academic-years'),
+      ));
+    }
+
+    if (isTeacherOrAbove) {
+      items.add(_MenuItem(
+        icon: Icons.class_outlined,
+        title: 'Classrooms',
+        subtitle: 'Manage classes and sections',
+        color: Colors.indigo,
+        onTap: () => context.push('/classrooms'),
+      ));
+    }
+
+    if (isAdmin) {
+      items.add(_MenuItem(
+        icon: Icons.people_outline,
+        title: 'Students',
+        subtitle: 'Enroll and manage students',
+        color: Colors.green,
+        onTap: () => context.push('/students'),
+      ));
+      items.add(_MenuItem(
+        icon: Icons.badge_outlined,
+        title: 'Staff',
+        subtitle: 'Manage teachers and staff',
+        color: Colors.purple,
+        onTap: () => context.push('/staff'),
+      ));
+    }
+
+    if (role == 'TEACHER') {
+      items.add(_MenuItem(
+        icon: Icons.person_pin_outlined,
+        title: 'My Profile',
+        subtitle: 'View your profile and assigned sections',
+        color: Colors.deepPurple,
+        onTap: () => context.push('/teacher/my-profile'),
+      ));
+      items.add(_MenuItem(
+        icon: Icons.people_outline,
+        title: 'Students',
+        subtitle: 'View students',
+        color: Colors.orange,
+        onTap: () => context.push('/students'),
+      ));
+    }
+
+    if (role == 'PARENT') {
+      items.add(_MenuItem(
+        icon: Icons.child_care_outlined,
+        title: 'My Children',
+        subtitle: "View your children's profile",
+        color: Colors.pink,
+        onTap: () => context.push('/my-children'),
+      ));
+    }
+
+    if (role == 'STUDENT') {
+      items.add(_MenuItem(
+        icon: Icons.person_outline,
+        title: 'My Profile',
+        subtitle: 'View your student profile',
+        color: Colors.indigo,
+        onTap: () => context.push('/profile'),
+      ));
+    }
+
+    return items;
   }
 }
 
@@ -189,8 +231,8 @@ class _MenuCard extends StatelessWidget {
           ),
           child: Icon(item.icon, color: item.color),
         ),
-        title: Text(item.title,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title:
+            Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text(item.subtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: item.onTap,

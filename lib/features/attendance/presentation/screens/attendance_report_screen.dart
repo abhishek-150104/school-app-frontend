@@ -3,16 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/attendance_provider.dart';
 import '../../data/models/attendance_models.dart';
+import '../../data/repositories/attendance_repository.dart';
 
 class AttendanceReportScreen extends ConsumerStatefulWidget {
-  final String schoolId;
   final String sectionId;
   final String sectionName;
   final String classRoomName;
 
   const AttendanceReportScreen({
     super.key,
-    required this.schoolId,
     required this.sectionId,
     required this.sectionName,
     required this.classRoomName,
@@ -32,7 +31,6 @@ class _AttendanceReportScreenState
 
   String get _fromStr => DateFormat('yyyy-MM-dd').format(_from);
   String get _toStr => DateFormat('yyyy-MM-dd').format(_to);
-  String get _providerKey => '${widget.schoolId}:${widget.sectionId}';
 
   @override
   void initState() {
@@ -49,7 +47,7 @@ class _AttendanceReportScreenState
 
   void _loadSummary() {
     ref
-        .read(attendanceSummaryProvider(_providerKey).notifier)
+        .read(attendanceSummaryProvider(widget.sectionId).notifier)
         .load(_fromStr, _toStr);
   }
 
@@ -72,7 +70,7 @@ class _AttendanceReportScreenState
   @override
   Widget build(BuildContext context) {
     final summaryAsync =
-        ref.watch(attendanceSummaryProvider(_providerKey));
+        ref.watch(attendanceSummaryProvider(widget.sectionId));
 
     return Scaffold(
       appBar: AppBar(
@@ -125,7 +123,6 @@ class _AttendanceReportScreenState
 
                 // Tab 2: Date view — single day
                 _DateViewTab(
-                  schoolId: widget.schoolId,
                   sectionId: widget.sectionId,
                 ),
               ],
@@ -258,11 +255,9 @@ class _SummaryTab extends StatelessWidget {
 }
 
 class _DateViewTab extends ConsumerStatefulWidget {
-  final String schoolId;
   final String sectionId;
 
-  const _DateViewTab(
-      {required this.schoolId, required this.sectionId});
+  const _DateViewTab({required this.sectionId});
 
   @override
   ConsumerState<_DateViewTab> createState() => _DateViewTabState();
@@ -288,7 +283,6 @@ class _DateViewTabState extends ConsumerState<_DateViewTab> {
     try {
       final repo = ref.read(attendanceRepositoryProvider);
       final records = await repo.getBySection(
-        widget.schoolId,
         widget.sectionId,
         DateFormat('yyyy-MM-dd').format(_date),
       );

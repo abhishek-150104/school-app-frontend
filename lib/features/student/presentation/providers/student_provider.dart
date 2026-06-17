@@ -2,17 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/student_models.dart';
 import '../../data/repositories/student_repository.dart';
 
-// ── Student List (by schoolId) ────────────────────────────────────────────────
+// ── Student List ──────────────────────────────────────────────────────────────
 
 class StudentListNotifier
     extends StateNotifier<AsyncValue<List<StudentModel>>> {
   final StudentRepository _repo;
-  final String schoolId;
   String? _classRoomId;
   String? _sectionId;
 
-  StudentListNotifier(this._repo, this.schoolId)
-      : super(const AsyncValue.loading()) {
+  StudentListNotifier(this._repo) : super(const AsyncValue.loading()) {
     load();
   }
 
@@ -30,7 +28,6 @@ class StudentListNotifier
     }
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repo.getStudents(
-          schoolId,
           classRoomId: _classRoomId,
           sectionId: _sectionId,
         ));
@@ -42,13 +39,12 @@ class StudentListNotifier
       return;
     }
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-        () => _repo.searchStudents(schoolId, query.trim()));
+    state = await AsyncValue.guard(() => _repo.searchStudents(query.trim()));
   }
 
   Future<String?> enroll(Map<String, dynamic> data) async {
     try {
-      await _repo.enrollStudent(schoolId, data);
+      await _repo.enrollStudent(data);
       await load();
       return null;
     } catch (e) {
@@ -58,7 +54,7 @@ class StudentListNotifier
 
   Future<String?> update(String studentId, Map<String, dynamic> data) async {
     try {
-      await _repo.updateStudent(schoolId, studentId, data);
+      await _repo.updateStudent(studentId, data);
       await load();
       return null;
     } catch (e) {
@@ -68,7 +64,7 @@ class StudentListNotifier
 
   Future<String?> deactivate(String studentId) async {
     try {
-      await _repo.deactivateStudent(schoolId, studentId);
+      await _repo.deactivateStudent(studentId);
       await load();
       return null;
     } catch (e) {
@@ -78,7 +74,7 @@ class StudentListNotifier
 
   Future<String?> linkParent(String studentId, String parentId) async {
     try {
-      await _repo.linkParent(schoolId, studentId, parentId);
+      await _repo.linkParent(studentId, parentId);
       await load();
       return null;
     } catch (e) {
@@ -86,10 +82,9 @@ class StudentListNotifier
     }
   }
 
-  Future<String?> transfer(
-      String studentId, Map<String, dynamic> data) async {
+  Future<String?> transfer(String studentId, Map<String, dynamic> data) async {
     try {
-      await _repo.transferStudent(schoolId, studentId, data);
+      await _repo.transferStudent(studentId, data);
       await load();
       return null;
     } catch (e) {
@@ -98,10 +93,9 @@ class StudentListNotifier
   }
 }
 
-final studentListProvider = StateNotifierProvider.family<StudentListNotifier,
-    AsyncValue<List<StudentModel>>, String>(
-  (ref, schoolId) =>
-      StudentListNotifier(ref.read(studentRepositoryProvider), schoolId),
+final studentListProvider =
+    StateNotifierProvider<StudentListNotifier, AsyncValue<List<StudentModel>>>(
+  (ref) => StudentListNotifier(ref.read(studentRepositoryProvider)),
 );
 
 // ── My Children (PARENT role) ─────────────────────────────────────────────────

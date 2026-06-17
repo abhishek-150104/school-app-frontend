@@ -9,11 +9,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../core/utils/validators.dart';
 
 class ClassRoomsScreen extends ConsumerStatefulWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const ClassRoomsScreen(
-      {super.key, required this.schoolId, required this.schoolName});
+  const ClassRoomsScreen({super.key});
 
   @override
   ConsumerState<ClassRoomsScreen> createState() => _ClassRoomsScreenState();
@@ -24,22 +20,15 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final classesAsync = ref.watch(classRoomProvider(widget.schoolId));
-    final yearsAsync = ref.watch(academicYearProvider(widget.schoolId));
+    final classesAsync = ref.watch(classRoomProvider);
+    final yearsAsync = ref.watch(academicYearProvider);
     final user = ref.watch(authProvider).user;
     final canEdit =
         user?.isSuperAdmin == true || user?.isSchoolAdmin == true;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Classrooms', style: TextStyle(fontSize: 16)),
-            Text(widget.schoolName,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal)),
-          ],
-        ),
+        title: const Text('Classrooms', style: TextStyle(fontSize: 16)),
       ),
       floatingActionButton: canEdit
           ? FloatingActionButton.extended(
@@ -67,7 +56,7 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
                               onSelected: (_) {
                                 setState(() => _selectedYearId = null);
                                 ref
-                                    .read(classRoomProvider(widget.schoolId)
+                                    .read(classRoomProvider
                                         .notifier)
                                     .load();
                               },
@@ -82,8 +71,7 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
                                       setState(
                                           () => _selectedYearId = y.id);
                                       ref
-                                          .read(classRoomProvider(
-                                                  widget.schoolId)
+                                          .read(classRoomProvider
                                               .notifier)
                                           .load(academicYearId: y.id);
                                     },
@@ -115,7 +103,7 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
                 }
                 return RefreshIndicator(
                   onRefresh: () => ref
-                      .read(classRoomProvider(widget.schoolId).notifier)
+                      .read(classRoomProvider.notifier)
                       .load(academicYearId: _selectedYearId),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -142,10 +130,58 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600)),
                           subtitle: Text(cls.academicYearLabel),
-                          trailing: const Icon(Icons.chevron_right),
+                          trailing: PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert),
+                            onSelected: (value) {
+                              final extra = {
+                                'className': cls.name,
+                              };
+                              if (value == 'sections') {
+                                context.push(
+                                    '/classrooms/${cls.id}/sections',
+                                    extra: extra);
+                              } else if (value == 'subjects') {
+                                context.push(
+                                    '/classrooms/${cls.id}/subjects',
+                                    extra: extra);
+                              } else if (value == 'delete' && canEdit) {
+                                _showClassOptions(context, cls.id, cls.name);
+                              }
+                            },
+                            itemBuilder: (_) => [
+                              const PopupMenuItem(
+                                value: 'sections',
+                                child: ListTile(
+                                  leading: Icon(Icons.view_module_outlined),
+                                  title: Text('Sections'),
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'subjects',
+                                child: ListTile(
+                                  leading: Icon(Icons.menu_book_outlined),
+                                  title: Text('Subjects'),
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                              ),
+                              if (canEdit)
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: ListTile(
+                                    leading: Icon(Icons.delete_outline,
+                                        color: Colors.red.shade400),
+                                    title: Text('Delete',
+                                        style: TextStyle(
+                                            color: Colors.red.shade400)),
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                ),
+                            ],
+                          ),
                           onTap: () => context.push(
-                              '/schools/${widget.schoolId}/classrooms/${cls.id}/sections',
-                              extra: {'className': cls.name, 'schoolName': widget.schoolName}),
+                              '/classrooms/${cls.id}/sections',
+                              extra: {'className': cls.name}),
                           onLongPress: canEdit
                               ? () =>
                                   _showClassOptions(context, cls.id, cls.name)
@@ -164,7 +200,7 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
   }
 
   void _showCreateClassDialog(BuildContext context) {
-    final yearsAsync = ref.read(academicYearProvider(widget.schoolId));
+    final yearsAsync = ref.read(academicYearProvider);
     final years = yearsAsync.valueOrNull ?? [];
 
     showModalBottomSheet(
@@ -173,7 +209,6 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _CreateClassSheet(
-        schoolId: widget.schoolId,
         years: years,
         ref: ref,
       ),
@@ -196,7 +231,7 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
               onTap: () async {
                 Navigator.pop(context);
                 final err = await ref
-                    .read(classRoomProvider(widget.schoolId).notifier)
+                    .read(classRoomProvider.notifier)
                     .delete(classId);
                 if (err != null && context.mounted) {
                   ScaffoldMessenger.of(context)
@@ -212,11 +247,10 @@ class _ClassRoomsScreenState extends ConsumerState<ClassRoomsScreen> {
 }
 
 class _CreateClassSheet extends StatefulWidget {
-  final String schoolId;
   final List years;
   final WidgetRef ref;
   const _CreateClassSheet(
-      {required this.schoolId, required this.years, required this.ref});
+      {required this.years, required this.ref});
 
   @override
   State<_CreateClassSheet> createState() => _CreateClassSheetState();
@@ -251,7 +285,7 @@ class _CreateClassSheetState extends State<_CreateClassSheet> {
     }
     setState(() => _isLoading = true);
     final err = await widget.ref
-        .read(classRoomProvider(widget.schoolId).notifier)
+        .read(classRoomProvider.notifier)
         .create({
       'name': _nameCtrl.text.trim(),
       'academicYearId': _selectedYearId,

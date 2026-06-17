@@ -8,7 +8,6 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/school/presentation/screens/schools_screen.dart';
 import '../../features/school/presentation/screens/academic_years_screen.dart';
 import '../../features/school/presentation/screens/classrooms_screen.dart';
 import '../../features/school/presentation/screens/sections_screen.dart';
@@ -25,6 +24,9 @@ import '../../features/staff/data/models/staff_models.dart';
 import '../../features/attendance/presentation/screens/mark_attendance_screen.dart';
 import '../../features/attendance/presentation/screens/attendance_report_screen.dart';
 import '../../features/attendance/presentation/screens/student_attendance_screen.dart';
+import '../../features/auth/presentation/screens/account_setup_screen.dart';
+import '../../features/subject/presentation/screens/subjects_screen.dart';
+import '../../features/school/presentation/screens/schools_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -40,6 +42,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == '/splash';
 
       if (!isLoggedIn && !isAuthRoute) return '/auth/login';
+      if (isLoggedIn &&
+          authState.firstLogin &&
+          state.matchedLocation != '/auth/setup-account') {
+        return '/auth/setup-account';
+      }
       if (isLoggedIn && isAuthRoute) return '/home';
       return null;
     },
@@ -50,6 +57,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/auth/login', builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/auth/register', builder: (_, __) => const RegisterScreen()),
       GoRoute(path: '/auth/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
+      GoRoute(path: '/auth/setup-account', builder: (_, __) => const AccountSetupScreen()),
       GoRoute(
         path: '/auth/reset-password',
         builder: (_, state) =>
@@ -60,123 +68,105 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
       GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
 
-      // ── Schools ───────────────────────────────────────────────────────────
-      GoRoute(path: '/schools', builder: (_, __) => const SchoolsScreen()),
-
+      // ── School Info ───────────────────────────────────────────────────────
       GoRoute(
-        path: '/schools/:schoolId/academic-years',
-        builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? 'School';
-          return AcademicYearsScreen(
-              schoolId: schoolId, schoolName: schoolName);
-        },
+        path: '/school-info',
+        builder: (_, __) => const SchoolInfoScreen(),
+      ),
+
+      // ── Academic Years ────────────────────────────────────────────────────
+      GoRoute(
+        path: '/academic-years',
+        builder: (_, __) => const AcademicYearsScreen(),
+      ),
+
+      // ── Classrooms ────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/classrooms',
+        builder: (_, __) => const ClassRoomsScreen(),
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/classrooms',
+        path: '/classrooms/:classId/subjects',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? 'School';
-          return ClassRoomsScreen(
-              schoolId: schoolId, schoolName: schoolName);
-        },
-      ),
-
-      GoRoute(
-        path: '/schools/:schoolId/classrooms/:classId/sections',
-        builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final classId = state.pathParameters['classId']!;
           final extra = state.extra as Map<String, String>? ?? {};
-          return SectionsScreen(
-            schoolId: schoolId,
+          return SubjectsScreen(
             classId: classId,
             className: extra['className'] ?? 'Class',
-            schoolName: extra['schoolName'] ?? 'School',
           );
         },
       ),
 
-      // ── Students ──────────────────────────────────────────────────────────────
       GoRoute(
-        path: '/schools/:schoolId/students',
+        path: '/classrooms/:classId/sections',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? '';
-          return StudentsScreen(schoolId: schoolId, schoolName: schoolName);
+          final classId = state.pathParameters['classId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return SectionsScreen(
+            classId: classId,
+            className: extra['className'] ?? 'Class',
+          );
         },
       ),
 
+      // ── Students ──────────────────────────────────────────────────────────
       GoRoute(
-        path: '/schools/:schoolId/students/enroll',
-        builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? '';
-          return EnrollStudentScreen(
-              schoolId: schoolId, schoolName: schoolName);
-        },
+        path: '/students',
+        builder: (_, __) => const StudentsScreen(),
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/students/:studentId',
+        path: '/students/enroll',
+        builder: (_, __) => const EnrollStudentScreen(),
+      ),
+
+      GoRoute(
+        path: '/students/:studentId',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final student = state.extra as StudentModel;
-          return StudentDetailScreen(schoolId: schoolId, student: student);
+          return StudentDetailScreen(student: student);
         },
       ),
 
-      // ── Parent ────────────────────────────────────────────────────────────────
+      // ── Parent ────────────────────────────────────────────────────────────
       GoRoute(
         path: '/my-children',
         builder: (_, __) => const MyChildrenScreen(),
       ),
 
-      // ── Staff ─────────────────────────────────────────────────────────────────
+      // ── Staff ─────────────────────────────────────────────────────────────
       GoRoute(
-        path: '/schools/:schoolId/staff',
-        builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? '';
-          return StaffScreen(schoolId: schoolId, schoolName: schoolName);
-        },
+        path: '/staff',
+        builder: (_, __) => const StaffScreen(),
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/staff/create',
-        builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
-          final schoolName = state.extra as String? ?? '';
-          return CreateStaffScreen(
-              schoolId: schoolId, schoolName: schoolName);
-        },
+        path: '/staff/create',
+        builder: (_, __) => const CreateStaffScreen(),
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/staff/:staffId',
+        path: '/staff/:staffId',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final staff = state.extra as StaffModel;
-          return StaffDetailScreen(schoolId: schoolId, staff: staff);
+          return StaffDetailScreen(staff: staff);
         },
       ),
 
-      // ── Teacher ───────────────────────────────────────────────────────────────
+      // ── Teacher ───────────────────────────────────────────────────────────
       GoRoute(
         path: '/teacher/my-profile',
         builder: (_, __) => const TeacherProfileScreen(),
       ),
 
-      // ── Attendance ────────────────────────────────────────────────────────────
+      // ── Attendance ────────────────────────────────────────────────────────
       GoRoute(
-        path: '/schools/:schoolId/sections/:sectionId/mark-attendance',
+        path: '/sections/:sectionId/mark-attendance',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final sectionId = state.pathParameters['sectionId']!;
           final extra = state.extra as Map<String, String>? ?? {};
           return MarkAttendanceScreen(
-            schoolId: schoolId,
             sectionId: sectionId,
             sectionName: extra['sectionName'] ?? '',
             classRoomName: extra['classRoomName'] ?? '',
@@ -185,13 +175,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/sections/:sectionId/attendance-report',
+        path: '/sections/:sectionId/attendance-report',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final sectionId = state.pathParameters['sectionId']!;
           final extra = state.extra as Map<String, String>? ?? {};
           return AttendanceReportScreen(
-            schoolId: schoolId,
             sectionId: sectionId,
             sectionName: extra['sectionName'] ?? '',
             classRoomName: extra['classRoomName'] ?? '',
@@ -200,13 +188,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
-        path: '/schools/:schoolId/students/:studentId/attendance',
+        path: '/students/:studentId/attendance',
         builder: (_, state) {
-          final schoolId = state.pathParameters['schoolId']!;
           final studentId = state.pathParameters['studentId']!;
           final studentName = state.extra as String? ?? 'Student';
           return StudentAttendanceScreen(
-            schoolId: schoolId,
             studentId: studentId,
             studentName: studentName,
           );
@@ -222,11 +208,21 @@ class _AuthChangeNotifier extends ChangeNotifier {
   }
 }
 
-class _SplashScreen extends StatelessWidget {
+class _SplashScreen extends ConsumerWidget {
   const _SplashScreen();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
+    if (auth.isInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (auth.isAuthenticated) {
+          context.go('/home');
+        } else {
+          context.go('/auth/login');
+        }
+      });
+    }
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
     );

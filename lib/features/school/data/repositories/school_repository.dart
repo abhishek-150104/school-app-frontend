@@ -11,107 +11,85 @@ class SchoolRepository {
   final DioClient _dio;
   SchoolRepository(this._dio);
 
-  // ── Schools ───────────────────────────────────────────────────────────────
+  // ── School (single) ───────────────────────────────────────────────────────
 
-  Future<List<SchoolModel>> getSchools() async {
-    final res = await _dio.get(ApiConstants.schools);
-    return (res.data['data'] as List)
-        .map((e) => SchoolModel.fromJson(e))
-        .toList();
-  }
-
-  Future<SchoolModel> createSchool(Map<String, dynamic> data) async {
-    final res = await _dio.post(ApiConstants.schools, data: data);
+  Future<SchoolModel> getSchool() async {
+    final res = await _dio.get(ApiConstants.school);
     return SchoolModel.fromJson(res.data['data']);
   }
 
-  Future<SchoolModel> updateSchool(String id, Map<String, dynamic> data) async {
-    final res = await _dio.put(ApiConstants.school(id), data: data);
+  Future<SchoolModel> updateSchool(Map<String, dynamic> data) async {
+    final res = await _dio.put(ApiConstants.school, data: data);
     return SchoolModel.fromJson(res.data['data']);
   }
-
-  Future<void> deleteSchool(String id) =>
-      _dio.delete(ApiConstants.school(id));
 
   // ── Academic Years ────────────────────────────────────────────────────────
 
-  Future<List<AcademicYearModel>> getAcademicYears(String schoolId) async {
-    final res = await _dio.get(ApiConstants.academicYears(schoolId));
+  Future<List<AcademicYearModel>> getAcademicYears() async {
+    final res = await _dio.get(ApiConstants.academicYears);
     return (res.data['data'] as List)
         .map((e) => AcademicYearModel.fromJson(e))
         .toList();
   }
 
-  Future<AcademicYearModel> createAcademicYear(
-      String schoolId, Map<String, dynamic> data) async {
-    final res =
-        await _dio.post(ApiConstants.academicYears(schoolId), data: data);
+  Future<AcademicYearModel> createAcademicYear(Map<String, dynamic> data) async {
+    final res = await _dio.post(ApiConstants.academicYears, data: data);
     return AcademicYearModel.fromJson(res.data['data']);
   }
 
-  Future<void> activateYear(String schoolId, String yearId) =>
-      _dio.post(ApiConstants.activateYear(schoolId, yearId));
+  Future<void> activateYear(String yearId) =>
+      _dio.post(ApiConstants.activateYear(yearId));
 
-  Future<void> deleteYear(String schoolId, String yearId) =>
-      _dio.delete(ApiConstants.academicYear(schoolId, yearId));
+  Future<void> deleteYear(String yearId) =>
+      _dio.delete(ApiConstants.academicYear(yearId));
 
   // ── Classrooms ────────────────────────────────────────────────────────────
 
-  Future<List<ClassRoomModel>> getClassrooms(String schoolId,
-      {String? academicYearId}) async {
-    final res = await _dio.get(ApiConstants.classrooms(schoolId),
-        params: academicYearId != null
-            ? {'academicYearId': academicYearId}
-            : null);
+  Future<List<ClassRoomModel>> getClassrooms({String? academicYearId}) async {
+    final res = await _dio.get(ApiConstants.classrooms,
+        params: academicYearId != null ? {'academicYearId': academicYearId} : null);
     return (res.data['data'] as List)
         .map((e) => ClassRoomModel.fromJson(e))
         .toList();
   }
 
-  Future<ClassRoomModel> createClassroom(
-      String schoolId, Map<String, dynamic> data) async {
-    final res =
-        await _dio.post(ApiConstants.classrooms(schoolId), data: data);
+  Future<ClassRoomModel> createClassroom(Map<String, dynamic> data) async {
+    final res = await _dio.post(ApiConstants.classrooms, data: data);
     return ClassRoomModel.fromJson(res.data['data']);
   }
 
   Future<ClassRoomModel> updateClassroom(
-      String schoolId, String classId, Map<String, dynamic> data) async {
-    final res = await _dio.put(ApiConstants.classroom(schoolId, classId),
-        data: data);
+      String classId, Map<String, dynamic> data) async {
+    final res = await _dio.put(ApiConstants.classroom(classId), data: data);
     return ClassRoomModel.fromJson(res.data['data']);
   }
 
-  Future<void> deleteClassroom(String schoolId, String classId) =>
-      _dio.delete(ApiConstants.classroom(schoolId, classId));
+  Future<void> deleteClassroom(String classId) =>
+      _dio.delete(ApiConstants.classroom(classId));
 
   // ── Sections ──────────────────────────────────────────────────────────────
 
-  Future<List<SectionModel>> getSections(
-      String schoolId, String classId) async {
-    final res =
-        await _dio.get(ApiConstants.sections(schoolId, classId));
+  Future<List<SectionModel>> getSections(String classId) async {
+    final res = await _dio.get(ApiConstants.sections(classId));
     return (res.data['data'] as List)
         .map((e) => SectionModel.fromJson(e))
         .toList();
   }
 
   Future<SectionModel> createSection(
-      String schoolId, String classId, Map<String, dynamic> data) async {
-    final res =
-        await _dio.post(ApiConstants.sections(schoolId, classId), data: data);
+      String classId, Map<String, dynamic> data) async {
+    final res = await _dio.post(ApiConstants.sections(classId), data: data);
     return SectionModel.fromJson(res.data['data']);
   }
 
-  Future<SectionModel> assignTeacher(String schoolId, String classId,
-      String sectionId, String teacherId) async {
+  Future<SectionModel> assignTeacher(
+      String classId, String sectionId, String teacherId) async {
     final res = await _dio.post(
-        ApiConstants.assignTeacher(schoolId, classId, sectionId),
+        ApiConstants.assignTeacher(classId, sectionId),
         data: {'teacherId': teacherId});
     return SectionModel.fromJson(res.data['data']);
   }
 
-  Future<void> deleteSection(
-          String schoolId, String classId, String sectionId) =>
-      _dio.delete(ApiConstants.section(schoolId, classId, sectionId));
+  Future<void> deleteSection(String classId, String sectionId) =>
+      _dio.delete(ApiConstants.section(classId, sectionId));
 }

@@ -75,13 +75,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 48),
                 AppTextField(
-                  label: 'Email or Phone',
-                  hint: 'Enter your email or 10-digit phone',
+                  label: 'Email / Student ID / Staff ID',
+                  hint: 'Enter your email, admission number, or employee ID',
                   controller: _identifierCtrl,
                   prefixIcon: Icons.person_outline,
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.next,
-                  validator: (v) => Validators.required(v, 'Email or Phone'),
+                  validator: (v) => Validators.required(v, 'Identifier'),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(

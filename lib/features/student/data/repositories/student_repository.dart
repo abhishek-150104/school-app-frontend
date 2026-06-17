@@ -11,65 +11,54 @@ class StudentRepository {
   final DioClient _dio;
   StudentRepository(this._dio);
 
-  Future<List<StudentModel>> getStudents(String schoolId,
-      {String? classRoomId, String? sectionId}) async {
+  Future<List<StudentModel>> getStudents({String? classRoomId, String? sectionId}) async {
     Map<String, dynamic>? params;
     if (sectionId != null) {
       params = {'sectionId': sectionId};
     } else if (classRoomId != null) {
       params = {'classRoomId': classRoomId};
     }
-    final res =
-        await _dio.get(ApiConstants.students(schoolId), params: params);
+    final res = await _dio.get(ApiConstants.students, params: params);
     return (res.data['data'] as List)
         .map((e) => StudentModel.fromJson(e))
         .toList();
   }
 
-  Future<List<StudentModel>> searchStudents(
-      String schoolId, String query) async {
-    final res = await _dio.get(ApiConstants.studentSearch(schoolId),
-        params: {'q': query});
+  Future<List<StudentModel>> searchStudents(String query) async {
+    final res = await _dio.get(ApiConstants.studentSearch, params: {'q': query});
     return (res.data['data'] as List)
         .map((e) => StudentModel.fromJson(e))
         .toList();
   }
 
-  Future<StudentModel> getStudent(String schoolId, String studentId) async {
-    final res =
-        await _dio.get(ApiConstants.student(schoolId, studentId));
+  Future<StudentModel> getStudent(String studentId) async {
+    final res = await _dio.get(ApiConstants.student(studentId));
     return StudentModel.fromJson(res.data['data']);
   }
 
-  Future<StudentModel> enrollStudent(
-      String schoolId, Map<String, dynamic> data) async {
-    final res =
-        await _dio.post(ApiConstants.students(schoolId), data: data);
+  Future<Map<String, dynamic>> enrollStudent(Map<String, dynamic> data) async {
+    final res = await _dio.post(ApiConstants.students, data: data);
+    return res.data['data'] as Map<String, dynamic>;
+  }
+
+  Future<StudentModel> updateStudent(String studentId, Map<String, dynamic> data) async {
+    final res = await _dio.put(ApiConstants.student(studentId), data: data);
     return StudentModel.fromJson(res.data['data']);
   }
 
-  Future<StudentModel> updateStudent(String schoolId, String studentId,
-      Map<String, dynamic> data) async {
-    final res = await _dio.put(ApiConstants.student(schoolId, studentId),
-        data: data);
-    return StudentModel.fromJson(res.data['data']);
-  }
+  Future<void> deactivateStudent(String studentId) =>
+      _dio.delete(ApiConstants.student(studentId));
 
-  Future<void> deactivateStudent(String schoolId, String studentId) =>
-      _dio.delete(ApiConstants.student(schoolId, studentId));
-
-  Future<StudentModel> linkParent(
-      String schoolId, String studentId, String parentId) async {
+  Future<StudentModel> linkParent(String studentId, String parentId) async {
     final res = await _dio.post(
-        ApiConstants.linkParent(schoolId, studentId),
+        ApiConstants.linkParent(studentId),
         data: {'parentId': parentId});
     return StudentModel.fromJson(res.data['data']);
   }
 
-  Future<StudentModel> transferStudent(String schoolId, String studentId,
-      Map<String, dynamic> data) async {
+  Future<StudentModel> transferStudent(String studentId, Map<String, dynamic> data) async {
     final res = await _dio.post(
-        ApiConstants.transferStudent(schoolId, studentId),
+        ApiConstants.transferStudent(studentId),
         data: data);
     return StudentModel.fromJson(res.data['data']);
   }

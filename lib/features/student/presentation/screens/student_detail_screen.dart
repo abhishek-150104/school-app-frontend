@@ -7,12 +7,10 @@ import '../../../school/presentation/providers/school_provider.dart';
 import '../../data/models/student_models.dart';
 
 class StudentDetailScreen extends ConsumerWidget {
-  final String schoolId;
   final StudentModel student;
 
   const StudentDetailScreen({
     super.key,
-    required this.schoolId,
     required this.student,
   });
 
@@ -220,7 +218,7 @@ class StudentDetailScreen extends ConsumerWidget {
     switch (action) {
       case 'attendance':
         context.push(
-          '/schools/$schoolId/students/${student.id}/attendance',
+          '/students/${student.id}/attendance',
           extra: student.fullName,
         );
         break;
@@ -246,7 +244,6 @@ class StudentDetailScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _EditStudentSheet(
-        schoolId: schoolId,
         student: student,
         onSaved: () => context.pop(),
       ),
@@ -275,7 +272,7 @@ class StudentDetailScreen extends ConsumerWidget {
               if (ctrl.text.trim().isEmpty) return;
               Navigator.pop(context);
               final err = await ref
-                  .read(studentListProvider(schoolId).notifier)
+                  .read(studentListProvider.notifier)
                   .linkParent(student.id, ctrl.text.trim());
               if (err != null && context.mounted) {
                 ScaffoldMessenger.of(context)
@@ -298,7 +295,6 @@ class StudentDetailScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _TransferSheet(
-        schoolId: schoolId,
         student: student,
         onTransferred: () => context.pop(),
       ),
@@ -322,7 +318,7 @@ class StudentDetailScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               final err = await ref
-                  .read(studentListProvider(schoolId).notifier)
+                  .read(studentListProvider.notifier)
                   .deactivate(student.id);
               if (err != null && context.mounted) {
                 ScaffoldMessenger.of(context)
@@ -342,12 +338,10 @@ class StudentDetailScreen extends ConsumerWidget {
 // ── Edit Student Sheet ────────────────────────────────────────────────────────
 
 class _EditStudentSheet extends ConsumerStatefulWidget {
-  final String schoolId;
   final StudentModel student;
   final VoidCallback onSaved;
 
   const _EditStudentSheet({
-    required this.schoolId,
     required this.student,
     required this.onSaved,
   });
@@ -402,7 +396,7 @@ class _EditStudentSheetState extends ConsumerState<_EditStudentSheet> {
       data['category'] = _category.text.trim();
 
     final err = await ref
-        .read(studentListProvider(widget.schoolId).notifier)
+        .read(studentListProvider.notifier)
         .update(widget.student.id, data);
 
     setState(() => _loading = false);
@@ -505,12 +499,10 @@ class _EditStudentSheetState extends ConsumerState<_EditStudentSheet> {
 // ── Transfer Sheet ────────────────────────────────────────────────────────────
 
 class _TransferSheet extends ConsumerStatefulWidget {
-  final String schoolId;
   final StudentModel student;
   final VoidCallback onTransferred;
 
   const _TransferSheet({
-    required this.schoolId,
     required this.student,
     required this.onTransferred,
   });
@@ -548,7 +540,7 @@ class _TransferSheetState extends ConsumerState<_TransferSheet> {
     };
 
     final err = await ref
-        .read(studentListProvider(widget.schoolId).notifier)
+        .read(studentListProvider.notifier)
         .transfer(widget.student.id, data);
 
     setState(() => _loading = false);
@@ -563,12 +555,9 @@ class _TransferSheetState extends ConsumerState<_TransferSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final classesAsync =
-        ref.watch(classRoomProvider(widget.schoolId));
-    final sectionKey =
-        '${widget.schoolId}:${_selectedClassId ?? ''}';
+    final classesAsync = ref.watch(classRoomProvider);
     final sectionsAsync = _selectedClassId != null
-        ? ref.watch(sectionProvider(sectionKey))
+        ? ref.watch(sectionProvider(_selectedClassId!))
         : null;
 
     return Padding(

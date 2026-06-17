@@ -8,12 +8,14 @@ import '../../../../core/storage/secure_storage.dart';
 class AuthState {
   final bool isLoading;
   final bool isInitialized;
+  final bool firstLogin;
   final String? error;
   final UserProfile? user;
 
   const AuthState({
     this.isLoading = false,
     this.isInitialized = false,
+    this.firstLogin = false,
     this.error,
     this.user,
   });
@@ -23,6 +25,7 @@ class AuthState {
   AuthState copyWith({
     bool? isLoading,
     bool? isInitialized,
+    bool? firstLogin,
     String? error,
     UserProfile? user,
     bool clearError = false,
@@ -31,6 +34,7 @@ class AuthState {
       AuthState(
         isLoading: isLoading ?? this.isLoading,
         isInitialized: isInitialized ?? this.isInitialized,
+        firstLogin: firstLogin ?? this.firstLogin,
         error: clearError ? null : (error ?? this.error),
         user: clearUser ? null : (user ?? this.user),
       );
@@ -47,17 +51,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _init() async {
-    final loggedIn = await _storage.isLoggedIn();
-    if (loggedIn) {
-      try {
-        final user = await _repository.getProfile();
-        state = state.copyWith(user: user, isInitialized: true);
-      } catch (_) {
-        await _storage.clearAll();
-        state = state.copyWith(isInitialized: true, clearUser: true);
+    try {
+      final loggedIn = await _storage.isLoggedIn()
+          .timeout(const Duration(seconds: 3), onTimeout: () => false);
+      if (loggedIn) {
+        try {
+          final user = await _repository.getProfile();
+          state = state.copyWith(user: user, isInitialized: true);
+        } catch (_) {
+          await _storage.clearAll();
+          state = state.copyWith(isInitialized: true, clearUser: true);
+        }
+      } else {
+        state = state.copyWith(isInitialized: true);
       }
-    } else {
-      state = state.copyWith(isInitialized: true);
+    } catch (_) {
+      state = state.copyWith(isInitialized: true, clearUser: true);
     }
   }
 
@@ -65,7 +74,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final auth = await _repository.login(identifier, password);
-      state = state.copyWith(isLoading: false, user: auth.user);
+      state = state.copyWith(isLoading: false, user: auth.user, firstLogin: auth.firstLogin);
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -107,6 +116,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await _repository.resetPassword(
           email: email, otp: otp, newPassword: newPassword);
       state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> setupAccount({String? email, String? phone, required String newPassword}) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _repository.setupAccount(email: email, phone: phone, newPassword: newPassword);
+      state = state.copyWith(isLoading: false, firstLogin: false);
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

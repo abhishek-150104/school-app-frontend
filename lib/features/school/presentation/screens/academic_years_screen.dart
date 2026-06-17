@@ -9,35 +9,23 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../core/utils/validators.dart';
 
 class AcademicYearsScreen extends ConsumerWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const AcademicYearsScreen(
-      {super.key, required this.schoolId, required this.schoolName});
+  const AcademicYearsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final yearsAsync = ref.watch(academicYearProvider(schoolId));
+    final yearsAsync = ref.watch(academicYearProvider);
     final user = ref.watch(authProvider).user;
     final canEdit =
         user?.isSuperAdmin == true || user?.isSchoolAdmin == true;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Academic Years', style: TextStyle(fontSize: 16)),
-            Text(schoolName,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal)),
-          ],
-        ),
+        title: const Text('Academic Years', style: TextStyle(fontSize: 16)),
         actions: [
           IconButton(
             icon: const Icon(Icons.class_outlined),
             tooltip: 'Classrooms',
-            onPressed: () => context.push('/schools/$schoolId/classrooms',
-                extra: schoolName),
+            onPressed: () => context.push('/classrooms'),
           ),
         ],
       ),
@@ -64,7 +52,7 @@ class AcademicYearsScreen extends ConsumerWidget {
           }
           return RefreshIndicator(
             onRefresh: () =>
-                ref.read(academicYearProvider(schoolId).notifier).load(),
+                ref.read(academicYearProvider.notifier).load(),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: years.length,
@@ -102,7 +90,7 @@ class AcademicYearsScreen extends ConsumerWidget {
                             ? TextButton(
                                 onPressed: () async {
                                   final err = await ref
-                                      .read(academicYearProvider(schoolId)
+                                      .read(academicYearProvider
                                           .notifier)
                                       .activate(year.id);
                                   if (err != null && context.mounted) {
@@ -130,15 +118,14 @@ class AcademicYearsScreen extends ConsumerWidget {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => _CreateYearSheet(schoolId: schoolId, ref: ref),
+      builder: (_) => _CreateYearSheet(ref: ref),
     );
   }
 }
 
 class _CreateYearSheet extends StatefulWidget {
-  final String schoolId;
   final WidgetRef ref;
-  const _CreateYearSheet({required this.schoolId, required this.ref});
+  const _CreateYearSheet({required this.ref});
 
   @override
   State<_CreateYearSheet> createState() => _CreateYearSheetState();
@@ -164,7 +151,7 @@ class _CreateYearSheetState extends State<_CreateYearSheet> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     final err = await widget.ref
-        .read(academicYearProvider(widget.schoolId).notifier)
+        .read(academicYearProvider.notifier)
         .create({
       'label': _labelCtrl.text.trim(),
       'startYear': int.parse(_startCtrl.text.trim()),

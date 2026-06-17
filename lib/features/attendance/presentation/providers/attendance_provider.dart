@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/attendance_models.dart';
 import '../../data/repositories/attendance_repository.dart';
 
-// ── Mark-attendance state (keyed by 'schoolId:sectionId:date') ───────────────
+// ── Mark-attendance state (keyed by sectionId) ───────────────────────────────
 
 class MarkAttendanceState {
   final bool isLoading;
@@ -32,13 +32,11 @@ class MarkAttendanceState {
   }
 }
 
-class MarkAttendanceNotifier
-    extends StateNotifier<MarkAttendanceState> {
+class MarkAttendanceNotifier extends StateNotifier<MarkAttendanceState> {
   final AttendanceRepository _repo;
-  final String schoolId;
   final String sectionId;
 
-  MarkAttendanceNotifier(this._repo, this.schoolId, this.sectionId)
+  MarkAttendanceNotifier(this._repo, this.sectionId)
       : super(const MarkAttendanceState());
 
   void initEntries(List<String> studentIds) {
@@ -70,8 +68,8 @@ class MarkAttendanceNotifier
   Future<bool> submit(String date) async {
     state = state.copyWith(isLoading: true);
     try {
-      final saved = await _repo.markBulk(
-          schoolId, sectionId, date, state.entries.values.toList());
+      final saved =
+          await _repo.markBulk(sectionId, date, state.entries.values.toList());
       state = state.copyWith(isLoading: false, saved: saved);
       return true;
     } catch (e) {
@@ -83,7 +81,7 @@ class MarkAttendanceNotifier
   Future<void> loadExisting(String date) async {
     state = state.copyWith(isLoading: true);
     try {
-      final records = await _repo.getBySection(schoolId, sectionId, date);
+      final records = await _repo.getBySection(sectionId, date);
       final map = Map<String, AttendanceEntry>.from(state.entries);
       for (final r in records) {
         map[r.studentId] = AttendanceEntry(
@@ -99,32 +97,27 @@ class MarkAttendanceNotifier
   }
 }
 
+// Key: sectionId
 final markAttendanceProvider = StateNotifierProvider.family<
     MarkAttendanceNotifier, MarkAttendanceState, String>(
-  (ref, key) {
-    final parts = key.split(':');
-    final schoolId = parts[0];
-    final sectionId = parts[1];
-    return MarkAttendanceNotifier(
-        ref.read(attendanceRepositoryProvider), schoolId, sectionId);
-  },
+  (ref, sectionId) =>
+      MarkAttendanceNotifier(ref.read(attendanceRepositoryProvider), sectionId),
 );
 
-// ── Attendance summary (keyed by 'schoolId:sectionId:from:to') ───────────────
+// ── Attendance summary (keyed by sectionId) ───────────────────────────────────
 
 class AttendanceSummaryNotifier
     extends StateNotifier<AsyncValue<AttendanceSummaryModel>> {
   final AttendanceRepository _repo;
-  final String schoolId;
   final String sectionId;
 
-  AttendanceSummaryNotifier(this._repo, this.schoolId, this.sectionId)
+  AttendanceSummaryNotifier(this._repo, this.sectionId)
       : super(const AsyncValue.loading());
 
   Future<void> load(String from, String to) async {
     state = const AsyncValue.loading();
     try {
-      final data = await _repo.getSummary(schoolId, sectionId, from, to);
+      final data = await _repo.getSummary(sectionId, from, to);
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -132,15 +125,13 @@ class AttendanceSummaryNotifier
   }
 }
 
+// Key: sectionId
 final attendanceSummaryProvider = StateNotifierProvider.family<
     AttendanceSummaryNotifier,
     AsyncValue<AttendanceSummaryModel>,
     String>(
-  (ref, key) {
-    final parts = key.split(':');
-    return AttendanceSummaryNotifier(
-        ref.read(attendanceRepositoryProvider), parts[0], parts[1]);
-  },
+  (ref, sectionId) => AttendanceSummaryNotifier(
+      ref.read(attendanceRepositoryProvider), sectionId),
 );
 
 // ── Student attendance history ────────────────────────────────────────────────
@@ -151,19 +142,17 @@ class StudentAttendanceNotifier
 
   StudentAttendanceNotifier(this._repo) : super(const AsyncValue.loading());
 
-  Future<void> loadForStudent(
-      String schoolId, String studentId, String from, String to) async {
+  Future<void> loadForStudent(String studentId, String from, String to) async {
     state = const AsyncValue.loading();
     try {
-      final data = await _repo.getByStudent(schoolId, studentId, from, to);
+      final data = await _repo.getByStudent(studentId, from, to);
       state = AsyncValue.data(data);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
   }
 
-  Future<void> loadForChild(
-      String studentId, String from, String to) async {
+  Future<void> loadForChild(String studentId, String from, String to) async {
     state = const AsyncValue.loading();
     try {
       final data = await _repo.getMyChildAttendance(studentId, from, to);
@@ -178,6 +167,6 @@ final studentAttendanceProvider = StateNotifierProvider.family<
     StudentAttendanceNotifier,
     AsyncValue<List<AttendanceModel>>,
     String>(
-  (ref, studentId) => StudentAttendanceNotifier(
-      ref.read(attendanceRepositoryProvider)),
+  (ref, studentId) =>
+      StudentAttendanceNotifier(ref.read(attendanceRepositoryProvider)),
 );

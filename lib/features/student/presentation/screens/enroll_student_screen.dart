@@ -5,14 +5,7 @@ import '../providers/student_provider.dart';
 import '../../../school/presentation/providers/school_provider.dart';
 
 class EnrollStudentScreen extends ConsumerStatefulWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const EnrollStudentScreen({
-    super.key,
-    required this.schoolId,
-    required this.schoolName,
-  });
+  const EnrollStudentScreen({super.key});
 
   @override
   ConsumerState<EnrollStudentScreen> createState() =>
@@ -119,7 +112,7 @@ class _EnrollStudentScreenState extends ConsumerState<EnrollStudentScreen> {
     }
 
     final err = await ref
-        .read(studentListProvider(widget.schoolId).notifier)
+        .read(studentListProvider.notifier)
         .enroll(data);
 
     setState(() => _loading = false);
@@ -134,17 +127,14 @@ class _EnrollStudentScreenState extends ConsumerState<EnrollStudentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final yearsAsync =
-        ref.watch(academicYearProvider(widget.schoolId));
-    final classesAsync =
-        ref.watch(classRoomProvider(widget.schoolId));
-    final sectionKey = '${widget.schoolId}:${_selectedClassId ?? ''}';
+    final yearsAsync = ref.watch(academicYearProvider);
+    final classesAsync = ref.watch(classRoomProvider);
     final sectionsAsync = _selectedClassId != null
-        ? ref.watch(sectionProvider(sectionKey))
+        ? ref.watch(sectionProvider(_selectedClassId!))
         : null;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Enroll — ${widget.schoolName}')),
+      appBar: AppBar(title: const Text('Enroll Student')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

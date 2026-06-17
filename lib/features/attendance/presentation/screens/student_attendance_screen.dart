@@ -6,13 +6,11 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/attendance_models.dart';
 
 class StudentAttendanceScreen extends ConsumerStatefulWidget {
-  final String schoolId;
   final String studentId;
   final String studentName;
 
   const StudentAttendanceScreen({
     super.key,
-    required this.schoolId,
     required this.studentId,
     required this.studentName,
   });
@@ -45,8 +43,7 @@ class _StudentAttendanceScreenState
     if (_isParent) {
       notifier.loadForChild(widget.studentId, _fromStr, _toStr);
     } else {
-      notifier.loadForStudent(
-          widget.schoolId, widget.studentId, _fromStr, _toStr);
+      notifier.loadForStudent(widget.studentId, _fromStr, _toStr);
     }
   }
 

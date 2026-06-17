@@ -6,12 +6,10 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/staff_models.dart';
 
 class StaffDetailScreen extends ConsumerWidget {
-  final String schoolId;
   final StaffModel staff;
 
   const StaffDetailScreen({
     super.key,
-    required this.schoolId,
     required this.staff,
   });
 
@@ -235,7 +233,6 @@ class StaffDetailScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _EditStaffSheet(
-        schoolId: schoolId,
         staff: staff,
         onSaved: () => context.pop(),
       ),
@@ -259,7 +256,7 @@ class StaffDetailScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               final err = await ref
-                  .read(staffListProvider(schoolId).notifier)
+                  .read(staffListProvider.notifier)
                   .deactivate(staff.id);
               if (err != null && context.mounted) {
                 ScaffoldMessenger.of(context)
@@ -279,12 +276,10 @@ class StaffDetailScreen extends ConsumerWidget {
 // ── Edit Staff Sheet ──────────────────────────────────────────────────────────
 
 class _EditStaffSheet extends ConsumerStatefulWidget {
-  final String schoolId;
   final StaffModel staff;
   final VoidCallback onSaved;
 
   const _EditStaffSheet({
-    required this.schoolId,
     required this.staff,
     required this.onSaved,
   });
@@ -347,7 +342,7 @@ class _EditStaffSheetState extends ConsumerState<_EditStaffSheet> {
     }
 
     final err = await ref
-        .read(staffListProvider(widget.schoolId).notifier)
+        .read(staffListProvider.notifier)
         .update(widget.staff.id, data);
 
     setState(() => _loading = false);

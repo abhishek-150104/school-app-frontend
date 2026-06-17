@@ -4,14 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/staff_provider.dart';
 
 class CreateStaffScreen extends ConsumerStatefulWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const CreateStaffScreen({
-    super.key,
-    required this.schoolId,
-    required this.schoolName,
-  });
+  const CreateStaffScreen({super.key});
 
   @override
   ConsumerState<CreateStaffScreen> createState() =>
@@ -82,7 +75,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
     }
 
     final err =
-        await ref.read(staffListProvider(widget.schoolId).notifier).create(data);
+        await ref.read(staffListProvider.notifier).create(data);
 
     setState(() => _loading = false);
 
@@ -97,7 +90,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Staff — ${widget.schoolName}')),
+      appBar: AppBar(title: const Text('Add Staff Member')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

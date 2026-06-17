@@ -7,14 +7,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../data/models/staff_models.dart';
 
 class StaffScreen extends ConsumerStatefulWidget {
-  final String schoolId;
-  final String schoolName;
-
-  const StaffScreen({
-    super.key,
-    required this.schoolId,
-    required this.schoolName,
-  });
+  const StaffScreen({super.key});
 
   @override
   ConsumerState<StaffScreen> createState() => _StaffScreenState();
@@ -31,18 +24,18 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
   }
 
   void _onSearchChanged(String value) {
-    ref.read(staffListProvider(widget.schoolId).notifier).search(value);
+    ref.read(staffListProvider.notifier).search(value);
   }
 
   void _clearSearch() {
     _searchCtrl.clear();
-    ref.read(staffListProvider(widget.schoolId).notifier).load();
+    ref.read(staffListProvider.notifier).load();
     setState(() => _searching = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final staffAsync = ref.watch(staffListProvider(widget.schoolId));
+    final staffAsync = ref.watch(staffListProvider);
     final user = ref.watch(authProvider).user;
     final canManage =
         user?.isSuperAdmin == true || user?.isSchoolAdmin == true;
@@ -59,7 +52,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
                   border: InputBorder.none,
                 ),
               )
-            : Text('${widget.schoolName} — Staff'),
+            : const Text('Staff'),
         actions: [
           if (_searching)
             IconButton(
@@ -77,10 +70,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
           ? FloatingActionButton.extended(
               icon: const Icon(Icons.person_add_outlined),
               label: const Text('Add Staff'),
-              onPressed: () => context.push(
-                '/schools/${widget.schoolId}/staff/create',
-                extra: widget.schoolName,
-              ),
+              onPressed: () => context.push('/staff/create'),
             )
           : null,
       body: staffAsync.when(
@@ -94,7 +84,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () =>
-                    ref.read(staffListProvider(widget.schoolId).notifier).load(),
+                    ref.read(staffListProvider.notifier).load(),
                 child: const Text('Retry'),
               ),
             ],
@@ -110,22 +100,18 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
                   : 'No staff members found',
               actionLabel: canManage ? 'Add Staff' : null,
               onAction: canManage
-                  ? () => context.push(
-                        '/schools/${widget.schoolId}/staff/create',
-                        extra: widget.schoolName,
-                      )
+                  ? () => context.push('/staff/create')
                   : null,
             );
           }
           return RefreshIndicator(
             onRefresh: () =>
-                ref.read(staffListProvider(widget.schoolId).notifier).load(),
+                ref.read(staffListProvider.notifier).load(),
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: staffList.length,
               itemBuilder: (_, i) => _StaffCard(
                 staff: staffList[i],
-                schoolId: widget.schoolId,
               ),
             ),
           );
@@ -137,9 +123,8 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
 
 class _StaffCard extends StatelessWidget {
   final StaffModel staff;
-  final String schoolId;
 
-  const _StaffCard({required this.staff, required this.schoolId});
+  const _StaffCard({required this.staff});
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +189,7 @@ class _StaffCard extends StatelessWidget {
               )
             : const Icon(Icons.chevron_right),
         onTap: () => context.push(
-          '/schools/$schoolId/staff/${staff.id}',
+          '/staff/${staff.id}',
           extra: staff,
         ),
       ),

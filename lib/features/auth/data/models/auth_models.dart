@@ -1,18 +1,26 @@
 class AuthResponse {
   final String accessToken;
   final String refreshToken;
+  final bool firstLogin;
   final UserProfile user;
 
   AuthResponse({
     required this.accessToken,
     required this.refreshToken,
+    this.firstLogin = false,
     required this.user,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) => AuthResponse(
         accessToken: json['accessToken'],
         refreshToken: json['refreshToken'],
-        user: UserProfile.fromJson(json['user']),
+        firstLogin: json['firstLogin'] ?? false,
+        user: UserProfile(
+          id: json['userId'] ?? '',
+          fullName: json['fullName'] ?? '',
+          role: (json['role'] ?? '').toString(),
+          enabled: true,
+        ),
       );
 }
 
@@ -51,6 +59,7 @@ class UserProfile {
   bool get isSchoolAdmin => role == 'SCHOOL_ADMIN';
   bool get isTeacher => role == 'TEACHER';
   bool get isParent => role == 'PARENT';
+  bool get isStudent => role == 'STUDENT';
 }
 
 class LoginRequest {
@@ -60,7 +69,7 @@ class LoginRequest {
   LoginRequest({required this.identifier, required this.password});
 
   Map<String, dynamic> toJson() => {
-        'identifier': identifier,
+        'username': identifier,
         'password': password,
       };
 }
