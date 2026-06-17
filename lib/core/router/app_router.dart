@@ -22,6 +22,9 @@ import '../../features/staff/presentation/screens/staff_detail_screen.dart';
 import '../../features/staff/presentation/screens/create_staff_screen.dart';
 import '../../features/staff/presentation/screens/teacher_profile_screen.dart';
 import '../../features/staff/data/models/staff_models.dart';
+import '../../features/attendance/presentation/screens/mark_attendance_screen.dart';
+import '../../features/attendance/presentation/screens/attendance_report_screen.dart';
+import '../../features/attendance/presentation/screens/student_attendance_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -163,6 +166,51 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/teacher/my-profile',
         builder: (_, __) => const TeacherProfileScreen(),
+      ),
+
+      // ── Attendance ────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/schools/:schoolId/sections/:sectionId/mark-attendance',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final sectionId = state.pathParameters['sectionId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return MarkAttendanceScreen(
+            schoolId: schoolId,
+            sectionId: sectionId,
+            sectionName: extra['sectionName'] ?? '',
+            classRoomName: extra['classRoomName'] ?? '',
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/sections/:sectionId/attendance-report',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final sectionId = state.pathParameters['sectionId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return AttendanceReportScreen(
+            schoolId: schoolId,
+            sectionId: sectionId,
+            sectionName: extra['sectionName'] ?? '',
+            classRoomName: extra['classRoomName'] ?? '',
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/schools/:schoolId/students/:studentId/attendance',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final studentId = state.pathParameters['studentId']!;
+          final studentName = state.extra as String? ?? 'Student';
+          return StudentAttendanceScreen(
+            schoolId: schoolId,
+            studentId: studentId,
+            studentName: studentName,
+          );
+        },
       ),
     ],
   );

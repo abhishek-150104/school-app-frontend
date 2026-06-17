@@ -228,7 +228,25 @@ class TeacherProfileScreen extends ConsumerWidget {
                           ),
                           subtitle: Text(
                               'Capacity: ${section.capacity} students'),
-                          trailing: const Icon(Icons.chevron_right),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextButton.icon(
+                                icon: const Icon(Icons.fact_check_outlined,
+                                    size: 16),
+                                label: const Text('Mark',
+                                    style: TextStyle(fontSize: 12)),
+                                onPressed: () => context.push(
+                                  '/schools/${profile.schoolId}/sections/${section.id}/mark-attendance',
+                                  extra: {
+                                    'sectionName': section.name,
+                                    'classRoomName': section.classRoomName,
+                                  },
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right),
+                            ],
+                          ),
                           onTap: () => context.push(
                             '/schools/${profile.schoolId}/students',
                             extra: profile.schoolName,
