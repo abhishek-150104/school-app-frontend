@@ -8,17 +8,18 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/school/presentation/screens/schools_screen.dart';
+import '../../features/school/presentation/screens/academic_years_screen.dart';
+import '../../features/school/presentation/screens/classrooms_screen.dart';
+import '../../features/school/presentation/screens/sections_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final authNotifier = ref.read(authProvider.notifier);
-
   return GoRouter(
     initialLocation: '/splash',
     refreshListenable: _AuthChangeNotifier(ref),
     redirect: (context, state) {
       final authState = ref.read(authProvider);
 
-      // Wait until auth is initialized (checked secure storage)
       if (!authState.isInitialized) return '/splash';
 
       final isLoggedIn = authState.isAuthenticated;
@@ -32,41 +33,61 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
 
-      // Auth routes
-      GoRoute(
-        path: '/auth/login',
-        builder: (_, __) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/auth/register',
-        builder: (_, __) => const RegisterScreen(),
-      ),
-      GoRoute(
-        path: '/auth/forgot-password',
-        builder: (_, __) => const ForgotPasswordScreen(),
-      ),
+      // ── Auth ──────────────────────────────────────────────────────────────
+      GoRoute(path: '/auth/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/auth/register', builder: (_, __) => const RegisterScreen()),
+      GoRoute(path: '/auth/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
       GoRoute(
         path: '/auth/reset-password',
+        builder: (_, state) =>
+            ResetPasswordScreen(email: state.extra as String? ?? ''),
+      ),
+
+      // ── Core ──────────────────────────────────────────────────────────────
+      GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+      GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+
+      // ── Schools ───────────────────────────────────────────────────────────
+      GoRoute(path: '/schools', builder: (_, __) => const SchoolsScreen()),
+
+      GoRoute(
+        path: '/schools/:schoolId/academic-years',
         builder: (_, state) {
-          final email = state.extra as String? ?? '';
-          return ResetPasswordScreen(email: email);
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? 'School';
+          return AcademicYearsScreen(
+              schoolId: schoolId, schoolName: schoolName);
         },
       ),
 
-      // Protected routes
       GoRoute(
-        path: '/home',
-        builder: (_, __) => const HomeScreen(),
+        path: '/schools/:schoolId/classrooms',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final schoolName = state.extra as String? ?? 'School';
+          return ClassRoomsScreen(
+              schoolId: schoolId, schoolName: schoolName);
+        },
       ),
+
       GoRoute(
-        path: '/profile',
-        builder: (_, __) => const ProfileScreen(),
+        path: '/schools/:schoolId/classrooms/:classId/sections',
+        builder: (_, state) {
+          final schoolId = state.pathParameters['schoolId']!;
+          final classId = state.pathParameters['classId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return SectionsScreen(
+            schoolId: schoolId,
+            classId: classId,
+            className: extra['className'] ?? 'Class',
+            schoolName: extra['schoolName'] ?? 'School',
+          );
+        },
       ),
     ],
   );
 });
 
-// Listens to auth state changes and notifies go_router to re-evaluate redirects
 class _AuthChangeNotifier extends ChangeNotifier {
   _AuthChangeNotifier(Ref ref) {
     ref.listen(authProvider, (_, __) => notifyListeners());

@@ -102,7 +102,7 @@ class HomeScreen extends ConsumerWidget {
           _MenuItem(
             icon: Icons.business_outlined,
             title: 'Schools',
-            subtitle: 'Manage schools',
+            subtitle: 'Create and manage schools',
             color: Colors.blue,
             onTap: () => context.push('/schools'),
           ),
@@ -110,10 +110,10 @@ class HomeScreen extends ConsumerWidget {
       case 'SCHOOL_ADMIN':
         return [
           _MenuItem(
-            icon: Icons.class_outlined,
-            title: 'Classes',
-            subtitle: 'Manage classes & sections',
-            color: Colors.indigo,
+            icon: Icons.business_outlined,
+            title: 'Schools',
+            subtitle: 'View and manage your school',
+            color: Colors.blue,
             onTap: () => context.push('/schools'),
           ),
           _MenuItem(
@@ -121,7 +121,7 @@ class HomeScreen extends ConsumerWidget {
             title: 'Students',
             subtitle: 'Manage student enrollment',
             color: Colors.teal,
-            onTap: () {},
+            onTap: () => context.push('/schools'),
           ),
         ];
       case 'TEACHER':
@@ -131,7 +131,7 @@ class HomeScreen extends ConsumerWidget {
             title: 'My Students',
             subtitle: 'View students in your class',
             color: Colors.orange,
-            onTap: () {},
+            onTap: () => context.push('/schools'),
           ),
         ];
       case 'PARENT':
