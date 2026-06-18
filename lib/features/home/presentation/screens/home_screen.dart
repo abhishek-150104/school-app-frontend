@@ -246,6 +246,14 @@ class HomeScreen extends ConsumerWidget {
       onTap: () => context.push('/library'),
     ));
 
+    items.add(_MenuItem(
+      icon: Icons.chat_outlined,
+      title: 'Messages',
+      subtitle: 'Chat with staff and groups',
+      color: Colors.indigo,
+      onTap: () => context.push('/chat'),
+    ));
+
     return items;
   }
 }
