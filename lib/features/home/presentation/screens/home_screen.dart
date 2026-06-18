@@ -262,6 +262,16 @@ class HomeScreen extends ConsumerWidget {
       onTap: () => context.push('/notifications'),
     ));
 
+    if (role == 'SUPER_ADMIN' || role == 'SCHOOL_ADMIN') {
+      items.add(_MenuItem(
+        icon: Icons.bar_chart_outlined,
+        title: 'Reports',
+        subtitle: 'Analytics and summaries',
+        color: Colors.deepPurple,
+        onTap: () => context.push('/reports'),
+      ));
+    }
+
     return items;
   }
 }
