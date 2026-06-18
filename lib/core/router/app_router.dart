@@ -41,6 +41,9 @@ import '../../features/fee/presentation/screens/fee_structures_screen.dart';
 import '../../features/fee/presentation/screens/fee_invoice_detail_screen.dart';
 import '../../features/fee/data/models/fee_models.dart';
 import '../../features/timetable/presentation/screens/timetable_screen.dart';
+import '../../features/exam/presentation/screens/exams_screen.dart';
+import '../../features/exam/presentation/screens/exam_detail_screen.dart';
+import '../../features/exam/data/models/exam_models.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -305,6 +308,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             sectionId: sectionId,
             sectionName: extra['sectionName'] ?? 'Section',
           );
+        },
+      ),
+
+      // ── Exams ─────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/exams',
+        builder: (_, __) => const ExamsScreen(),
+      ),
+
+      GoRoute(
+        path: '/exams/:examId',
+        builder: (_, state) {
+          final exam = state.extra as ExamModel;
+          return ExamDetailScreen(exam: exam);
         },
       ),
     ],

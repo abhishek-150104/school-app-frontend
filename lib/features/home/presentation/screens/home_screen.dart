@@ -230,6 +230,14 @@ class HomeScreen extends ConsumerWidget {
       ));
     }
 
+    items.add(_MenuItem(
+      icon: Icons.assignment_outlined,
+      title: 'Exams',
+      subtitle: 'View scheduled exams and results',
+      color: Colors.deepOrange,
+      onTap: () => context.push('/exams'),
+    ));
+
     return items;
   }
 }
