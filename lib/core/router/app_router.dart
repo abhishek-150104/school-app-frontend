@@ -46,6 +46,7 @@ import '../../features/exam/presentation/screens/exam_detail_screen.dart';
 import '../../features/exam/data/models/exam_models.dart';
 import '../../features/library/presentation/screens/library_screen.dart';
 import '../../features/chat/presentation/screens/chat_screen.dart';
+import '../../features/notification/presentation/screens/notifications_screen.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -337,6 +338,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/chat',
         builder: (_, __) => const ChatsScreen(),
+      ),
+
+      // ── Notifications ─────────────────────────────────────────────────────
+      GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationsScreen(),
       ),
     ],
   );

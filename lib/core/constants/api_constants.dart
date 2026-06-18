@@ -98,6 +98,19 @@ class ApiConstants {
   static const String chatMessages = '/api/chat/messages';
   static String channelMessages(String channelId) => '/api/chat/channels/$channelId/messages';
 
+  // Notifications
+  static const String notifications = '/api/notifications';
+  static const String notificationUnread = '/api/notifications/unread';
+  static const String notificationUnreadCount = '/api/notifications/unread/count';
+  static String markNotificationRead(String id) => '/api/notifications/$id/read';
+  static const String markAllNotificationsRead = '/api/notifications/read-all';
+
+  // Reports
+  static const String reportDashboard = '/api/reports/dashboard';
+  static const String reportAttendance = '/api/reports/attendance';
+  static const String reportFees = '/api/reports/fees';
+  static const String reportExams = '/api/reports/exams';
+
   // Circulars
   static const String circulars = '/api/circulars';
   static String circular(String id) => '/api/circulars/$id';
