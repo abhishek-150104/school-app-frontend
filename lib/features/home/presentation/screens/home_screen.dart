@@ -238,6 +238,14 @@ class HomeScreen extends ConsumerWidget {
       onTap: () => context.push('/exams'),
     ));
 
+    items.add(_MenuItem(
+      icon: Icons.library_books_outlined,
+      title: 'Library',
+      subtitle: 'Books and issue management',
+      color: Colors.teal,
+      onTap: () => context.push('/library'),
+    ));
+
     return items;
   }
 }

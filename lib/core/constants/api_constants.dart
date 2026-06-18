@@ -85,6 +85,19 @@ class ApiConstants {
   static const String feePayments = '/api/fees/payments';
   static String invoicePayments(String invoiceId) => '/api/fees/invoices/$invoiceId/payments';
 
+  // Library
+  static const String libraryBooks = '/api/library/books';
+  static const String libraryIssues = '/api/library/issues';
+  static String returnBook(String issueId) => '/api/library/issues/$issueId/return';
+  static const String activeIssues = '/api/library/issues/active';
+  static String memberIssues(String memberId) => '/api/library/issues/member/$memberId';
+
+  // Chat
+  static const String chatChannels = '/api/chat/channels';
+  static const String chatGroupChannels = '/api/chat/channels/group';
+  static const String chatMessages = '/api/chat/messages';
+  static String channelMessages(String channelId) => '/api/chat/channels/$channelId/messages';
+
   // Circulars
   static const String circulars = '/api/circulars';
   static String circular(String id) => '/api/circulars/$id';
