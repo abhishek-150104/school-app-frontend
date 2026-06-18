@@ -68,6 +68,13 @@ class ApiConstants {
   static String homeworkSubmissions(String homeworkId) => '/api/homework/$homeworkId/submissions';
   static String myChildHomework(String studentId) => '/api/parents/me/students/$studentId/homework';
 
+  // Fees
+  static const String feeStructures = '/api/fees/structures';
+  static const String feeInvoices = '/api/fees/invoices';
+  static String studentFeeInvoices(String studentId) => '/api/fees/invoices/student/$studentId';
+  static const String feePayments = '/api/fees/payments';
+  static String invoicePayments(String invoiceId) => '/api/fees/invoices/$invoiceId/payments';
+
   // Circulars
   static const String circulars = '/api/circulars';
   static String circular(String id) => '/api/circulars/$id';

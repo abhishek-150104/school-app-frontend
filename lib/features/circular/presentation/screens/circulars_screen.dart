@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/circular_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../data/models/circular_models.dart';
 
 class CircularsScreen extends ConsumerWidget {
   const CircularsScreen({super.key});
