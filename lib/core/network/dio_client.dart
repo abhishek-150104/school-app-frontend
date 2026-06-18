@@ -55,9 +55,13 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    final token = await _storage.getAccessToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    try {
+      final token = await _storage.getAccessToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
+    } catch (_) {
+      // Secure storage may fail on web (WebCrypto OperationError) — proceed without token
     }
     handler.next(options);
   }
@@ -68,24 +72,35 @@ class _AuthInterceptor extends Interceptor {
       final refreshed = await _tryRefresh();
       if (refreshed) {
         // Retry the original request with the new token
-        final token = await _storage.getAccessToken();
-        err.requestOptions.headers['Authorization'] = 'Bearer $token';
+        try {
+          final token = await _storage.getAccessToken();
+          err.requestOptions.headers['Authorization'] = 'Bearer $token';
+        } catch (_) {}
         try {
           final response = await _dio.fetch(err.requestOptions);
           return handler.resolve(response);
         } catch (_) {}
       }
       // Refresh failed — clear storage so router redirects to login
-      await _storage.clearAll();
+      try {
+        await _storage.clearAll();
+      } catch (_) {}
     }
 
-    final message = err.response?.data?['message'] ??
-        err.response?.data?['error'] ??
-        err.message ??
-        'Something went wrong';
+    String message;
+    try {
+      final data = err.response?.data;
+      message = (data is Map
+              ? (data['message'] ?? data['error'])?.toString()
+              : null) ??
+          err.message ??
+          'Something went wrong';
+    } catch (_) {
+      message = err.message ?? 'Something went wrong';
+    }
     handler.reject(DioException(
       requestOptions: err.requestOptions,
-      error: ApiException(message.toString(), err.response?.statusCode),
+      error: ApiException(message, err.response?.statusCode),
       response: err.response,
       type: err.type,
     ));

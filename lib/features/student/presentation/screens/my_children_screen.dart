@@ -102,7 +102,7 @@ class MyChildrenScreen extends ConsumerWidget {
                       ],
                     ),
                     onTap: () => context.push(
-                      '/schools/${child.schoolId}/students/${child.id}',
+                      '/students/${child.id}',
                       extra: child,
                     ),
                   ),

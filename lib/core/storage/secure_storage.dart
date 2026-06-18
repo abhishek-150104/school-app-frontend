@@ -15,10 +15,12 @@ class SecureStorageService {
     required String accessToken,
     required String refreshToken,
   }) async {
-    await Future.wait([
-      _storage.write(key: StorageKeys.accessToken, value: accessToken),
-      _storage.write(key: StorageKeys.refreshToken, value: refreshToken),
-    ]);
+    // Sequential writes required on web: flutter_secure_storage generates one
+    // encryption key per write when the key is absent — concurrent writes each
+    // generate a different key, the last one overwrites FlutterSecureStorage,
+    // and all earlier ciphertexts become unreadable (OperationError on read).
+    await _storage.write(key: StorageKeys.accessToken, value: accessToken);
+    await _storage.write(key: StorageKeys.refreshToken, value: refreshToken);
   }
 
   Future<void> saveUserInfo({
@@ -27,12 +29,10 @@ class SecureStorageService {
     required String? email,
     required String fullName,
   }) async {
-    await Future.wait([
-      _storage.write(key: StorageKeys.userId, value: userId),
-      _storage.write(key: StorageKeys.userRole, value: role),
-      _storage.write(key: StorageKeys.userEmail, value: email ?? ''),
-      _storage.write(key: StorageKeys.userFullName, value: fullName),
-    ]);
+    await _storage.write(key: StorageKeys.userId, value: userId);
+    await _storage.write(key: StorageKeys.userRole, value: role);
+    await _storage.write(key: StorageKeys.userEmail, value: email ?? '');
+    await _storage.write(key: StorageKeys.userFullName, value: fullName);
   }
 
   Future<String?> getAccessToken() =>

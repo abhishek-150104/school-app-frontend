@@ -67,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation != '/auth/setup-account') {
         return '/auth/setup-account';
       }
-      if (isLoggedIn && isAuthRoute) return '/home';
+      if (isLoggedIn && isAuthRoute && state.matchedLocation != '/auth/setup-account') return '/home';
       return null;
     },
     routes: [
