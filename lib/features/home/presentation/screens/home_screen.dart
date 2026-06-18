@@ -212,6 +212,14 @@ class HomeScreen extends ConsumerWidget {
       ));
     }
 
+    items.add(_MenuItem(
+      icon: Icons.campaign_outlined,
+      title: 'Circulars',
+      subtitle: 'View school announcements',
+      color: Colors.teal,
+      onTap: () => context.push('/circulars'),
+    ));
+
     return items;
   }
 }
