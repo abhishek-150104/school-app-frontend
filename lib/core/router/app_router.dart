@@ -40,6 +40,7 @@ import '../../features/fee/presentation/screens/fee_invoices_screen.dart';
 import '../../features/fee/presentation/screens/fee_structures_screen.dart';
 import '../../features/fee/presentation/screens/fee_invoice_detail_screen.dart';
 import '../../features/fee/data/models/fee_models.dart';
+import '../../features/timetable/presentation/screens/timetable_screen.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -291,6 +292,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) {
           final inv = state.extra as FeeInvoiceModel;
           return FeeInvoiceDetailScreen(invoice: inv);
+        },
+      ),
+
+      // ── Timetable ─────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/sections/:sectionId/timetable',
+        builder: (_, state) {
+          final sectionId = state.pathParameters['sectionId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return TimetableScreen(
+            sectionId: sectionId,
+            sectionName: extra['sectionName'] ?? 'Section',
+          );
         },
       ),
     ],
