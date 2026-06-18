@@ -36,6 +36,10 @@ import '../../features/circular/presentation/screens/circulars_screen.dart';
 import '../../features/circular/presentation/screens/circular_detail_screen.dart';
 import '../../features/circular/presentation/screens/create_circular_screen.dart';
 import '../../features/circular/data/models/circular_models.dart';
+import '../../features/fee/presentation/screens/fee_invoices_screen.dart';
+import '../../features/fee/presentation/screens/fee_structures_screen.dart';
+import '../../features/fee/presentation/screens/fee_invoice_detail_screen.dart';
+import '../../features/fee/data/models/fee_models.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -268,6 +272,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) {
           final circular = state.extra as CircularModel;
           return CircularDetailScreen(circular: circular);
+        },
+      ),
+
+      // ── Fees ──────────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/fees/invoices',
+        builder: (_, __) => const FeeInvoicesScreen(),
+      ),
+
+      GoRoute(
+        path: '/fees/structures',
+        builder: (_, __) => const FeeStructuresScreen(),
+      ),
+
+      GoRoute(
+        path: '/fees/invoices/:invoiceId',
+        builder: (_, state) {
+          final inv = state.extra as FeeInvoiceModel;
+          return FeeInvoiceDetailScreen(invoice: inv);
         },
       ),
     ],

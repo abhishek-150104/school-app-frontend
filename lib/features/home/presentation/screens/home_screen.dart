@@ -220,6 +220,16 @@ class HomeScreen extends ConsumerWidget {
       onTap: () => context.push('/circulars'),
     ));
 
+    if (isAdmin) {
+      items.add(_MenuItem(
+        icon: Icons.receipt_long_outlined,
+        title: 'Fee Management',
+        subtitle: 'Invoices, payments and fee structures',
+        color: Colors.indigo,
+        onTap: () => context.push('/fees/invoices'),
+      ));
+    }
+
     return items;
   }
 }
