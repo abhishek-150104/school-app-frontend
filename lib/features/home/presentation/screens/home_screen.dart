@@ -254,6 +254,14 @@ class HomeScreen extends ConsumerWidget {
       onTap: () => context.push('/chat'),
     ));
 
+    items.add(_MenuItem(
+      icon: Icons.notifications_outlined,
+      title: 'Notifications',
+      subtitle: 'View your notifications',
+      color: Colors.amber,
+      onTap: () => context.push('/notifications'),
+    ));
+
     return items;
   }
 }
