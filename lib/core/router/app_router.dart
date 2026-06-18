@@ -32,7 +32,10 @@ import '../../features/homework/presentation/screens/create_homework_screen.dart
 import '../../features/homework/presentation/screens/homework_detail_screen.dart';
 import '../../features/homework/presentation/screens/my_child_homework_screen.dart';
 import '../../features/homework/data/models/homework_models.dart';
-
+import '../../features/circular/presentation/screens/circulars_screen.dart';
+import '../../features/circular/presentation/screens/circular_detail_screen.dart';
+import '../../features/circular/presentation/screens/create_circular_screen.dart';
+import '../../features/circular/data/models/circular_models.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -246,6 +249,25 @@ final routerProvider = Provider<GoRouter>((ref) {
             studentId: studentId,
             studentName: studentName,
           );
+        },
+      ),
+
+      // ── Circulars ─────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/circulars',
+        builder: (_, __) => const CircularsScreen(),
+      ),
+
+      GoRoute(
+        path: '/circulars/create',
+        builder: (_, __) => const CreateCircularScreen(),
+      ),
+
+      GoRoute(
+        path: '/circulars/:circularId',
+        builder: (_, state) {
+          final circular = state.extra as CircularModel;
+          return CircularDetailScreen(circular: circular);
         },
       ),
     ],
