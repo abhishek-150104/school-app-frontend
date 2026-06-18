@@ -27,6 +27,11 @@ import '../../features/attendance/presentation/screens/student_attendance_screen
 import '../../features/auth/presentation/screens/account_setup_screen.dart';
 import '../../features/subject/presentation/screens/subjects_screen.dart';
 import '../../features/school/presentation/screens/schools_screen.dart';
+import '../../features/homework/presentation/screens/homework_screen.dart';
+import '../../features/homework/presentation/screens/create_homework_screen.dart';
+import '../../features/homework/presentation/screens/homework_detail_screen.dart';
+import '../../features/homework/presentation/screens/my_child_homework_screen.dart';
+import '../../features/homework/data/models/homework_models.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -193,6 +198,51 @@ final routerProvider = Provider<GoRouter>((ref) {
           final studentId = state.pathParameters['studentId']!;
           final studentName = state.extra as String? ?? 'Student';
           return StudentAttendanceScreen(
+            studentId: studentId,
+            studentName: studentName,
+          );
+        },
+      ),
+
+      // ── Homework ──────────────────────────────────────────────────────────
+      GoRoute(
+        path: '/sections/:sectionId/homework',
+        builder: (_, state) {
+          final sectionId = state.pathParameters['sectionId']!;
+          final extra = state.extra as Map<String, String>? ?? {};
+          return HomeworkScreen(
+            sectionId: sectionId,
+            sectionName: extra['sectionName'] ?? 'Section',
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/sections/:sectionId/homework/create',
+        builder: (_, state) {
+          final sectionId = state.pathParameters['sectionId']!;
+          final sectionName = state.extra as String? ?? 'Section';
+          return CreateHomeworkScreen(
+            sectionId: sectionId,
+            sectionName: sectionName,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/homework/:homeworkId',
+        builder: (_, state) {
+          final hw = state.extra as HomeworkModel;
+          return HomeworkDetailScreen(homework: hw);
+        },
+      ),
+
+      GoRoute(
+        path: '/my-child-homework/:studentId',
+        builder: (_, state) {
+          final studentId = state.pathParameters['studentId']!;
+          final studentName = state.extra as String? ?? 'Student';
+          return MyChildHomeworkScreen(
             studentId: studentId,
             studentName: studentName,
           );

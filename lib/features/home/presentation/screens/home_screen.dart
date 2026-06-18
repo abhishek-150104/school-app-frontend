@@ -183,6 +183,23 @@ class HomeScreen extends ConsumerWidget {
         color: Colors.pink,
         onTap: () => context.push('/my-children'),
       ));
+      items.add(_MenuItem(
+        icon: Icons.assignment_outlined,
+        title: 'My Child Homework',
+        subtitle: "View your child's homework",
+        color: Colors.orange,
+        onTap: () => context.push('/my-children'),
+      ));
+    }
+
+    if (isTeacherOrAbove) {
+      items.add(_MenuItem(
+        icon: Icons.assignment_outlined,
+        title: 'Homework',
+        subtitle: 'Manage homework assignments',
+        color: Colors.orange,
+        onTap: () => context.push('/classrooms'),
+      ));
     }
 
     if (role == 'STUDENT') {

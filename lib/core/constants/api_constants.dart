@@ -62,6 +62,12 @@ class ApiConstants {
   static String subject(String classId, String subjectId) =>
       '/api/classrooms/$classId/subjects/$subjectId';
 
+  // Homework
+  static String sectionHomework(String sectionId) => '/api/sections/$sectionId/homework';
+  static String homework(String homeworkId) => '/api/homework/$homeworkId';
+  static String homeworkSubmissions(String homeworkId) => '/api/homework/$homeworkId/submissions';
+  static String myChildHomework(String studentId) => '/api/parents/me/students/$studentId/homework';
+
   // Attendance
   static String sectionAttendance(String sectionId) =>
       '/api/sections/$sectionId/attendance';
