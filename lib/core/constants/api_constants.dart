@@ -68,6 +68,11 @@ class ApiConstants {
   static String homeworkSubmissions(String homeworkId) => '/api/homework/$homeworkId/submissions';
   static String myChildHomework(String studentId) => '/api/parents/me/students/$studentId/homework';
 
+  // Exams
+  static const String exams = '/api/exams';
+  static String examResults(String examId) => '/api/exams/$examId/results';
+  static String studentResults(String studentId) => '/api/students/$studentId/results';
+
   // Timetable
   static const String timetable = '/api/timetable';
   static String sectionTimetable(String sectionId) => '/api/sections/$sectionId/timetable';
